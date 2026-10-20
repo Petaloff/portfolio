@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { Logo } from "./Logo";
 import { LocaleSwitch, ModeToggle } from "./ui/Controls";
 
 export async function Header() {
@@ -19,8 +20,9 @@ export async function Header() {
         {t("skip")}
       </a>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
-        <Link href="/" className="font-mono text-sm font-semibold tracking-tight">
-          petaloff<span className="text-accent">_</span>
+        <Link href="/" aria-label="Petaloff" className="flex items-center gap-2.5 font-mono text-sm font-semibold tracking-tight">
+          <Logo className="h-5 w-4" />
+          petaloff
         </Link>
         <nav className="hidden items-center gap-6 text-sm text-muted md:flex">
           {links.map((l) => (
