@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   turbopack: {
+    // Pin the workspace root so a stray lockfile in a parent folder isn't picked up
+    root: import.meta.dirname,
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],
