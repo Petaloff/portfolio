@@ -6,6 +6,7 @@ import { Reveal } from "@/components/Reveal";
 const files = [
   { id: "about", name: "about.md", lang: "Markdown" },
   { id: "projects", name: "projects.tsx", lang: "TypeScript JSX" },
+  { id: "activity", name: "commits.git", lang: "Git" },
   { id: "stack", name: "stack.ts", lang: "TypeScript" },
   { id: "minecraft", name: "server.properties", lang: "Properties" },
   { id: "blog", name: "blog.log", lang: "Git Log" },
@@ -17,6 +18,7 @@ type FileId = (typeof files)[number]["id"];
 const commentPrefix: Record<FileId, string> = {
   about: "#",
   projects: "//",
+  activity: "#",
   stack: "//",
   minecraft: "#",
   blog: "#",
