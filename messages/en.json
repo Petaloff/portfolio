@@ -12,7 +12,8 @@
     "skip": "Skip to content",
     "minecraft": "Minecraft",
     "now": "Now",
-    "changelog": "Changelog"
+    "changelog": "Changelog",
+    "guestbook": "Guestbook"
   },
   "hero": {
     "kicker": "Fullstack developer",
@@ -114,5 +115,27 @@
   },
   "easter": {
     "given": "Gave 64 [Voxel] to You"
+  },
+  "activity": {
+    "title": "GitHub activity",
+    "hint": "drag to rotate, hover a column",
+    "day": "{count, plural, =0 {no contributions} one {# contribution} other {# contributions}}"
+  },
+  "guestbook": {
+    "title": "Guestbook",
+    "lead": "Leave a few words: feedback, an idea or just a hello. Sign in with Discord or GitHub and your avatar comes along.",
+    "signIn": "Sign in with",
+    "signOut": "Sign out",
+    "placeholder": "Hello from…",
+    "submit": "Sign the guestbook",
+    "empty": "Nothing here yet. Be the first.",
+    "disabled": "the guestbook isn't connected yet",
+    "delete": "delete",
+    "error": {
+      "empty": "Write something first",
+      "long": "Too long",
+      "rate": "Once a minute at most",
+      "auth": "Sign in first"
+    }
   }
 }

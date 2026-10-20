@@ -11,6 +11,9 @@ export async function Footer() {
         <a href={`/${locale}/blog/rss.xml`} className="hover:text-fg">
           {t("blog.rss")}
         </a>
+        <Link href="/guestbook" className="hover:text-fg">
+          {t("nav.guestbook")}
+        </Link>
         <Link href="/privacy" className="hover:text-fg">
           {t("privacy.title")}
         </Link>
