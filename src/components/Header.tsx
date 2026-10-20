@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { LocaleSwitch, ModeToggle, ThemeToggle } from "./ui/Controls";
+import { LocaleSwitch, ModeToggle } from "./ui/Controls";
 
 export async function Header() {
   const t = await getTranslations("nav");
@@ -32,7 +32,6 @@ export async function Header() {
             <ModeToggle />
           </div>
           <LocaleSwitch />
-          <ThemeToggle />
         </div>
       </div>
     </header>

@@ -61,19 +61,6 @@ export const modeStore = createStore<RenderMode>(
 );
 export const useRenderMode = () => useStore(modeStore);
 
-export type Theme = "dark" | "light";
-
-export const themeStore = createStore<Theme>(
-  "theme",
-  (saved) => (saved === "light" ? "light" : "dark"),
-  "dark",
-);
-export const useTheme = () => useStore(themeStore);
-
-themeStore.subscribe(() => {
-  document.documentElement.dataset.theme = themeStore.get();
-});
-
 export type Consent = "granted" | "denied" | "unset";
 
 export const consentStore = createStore<Consent>(

@@ -64,16 +64,12 @@
     "online": "online",
     "idle": "idle",
     "dnd": "do not disturb",
-    "offline": "offline",
-    "unknown": "status unavailable"
+    "offline": "offline"
   },
   "mode": {
     "enable3d": "Enable 3D",
     "disable3d": "Disable 3D",
     "hint": "Lightweight version. You can turn 3D on at any time."
-  },
-  "theme": {
-    "toggle": "Toggle theme"
   },
   "locale": {
     "switch": "Русский"

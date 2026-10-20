@@ -1,5 +1,4 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { FormationSection } from "@/components/FormationSection";
 import { Reveal } from "@/components/Reveal";
 import { getLiveStats } from "@/lib/live";
 import { SectionTitle } from "./SectionTitle";
@@ -16,7 +15,7 @@ export async function About() {
   ].filter((i) => i.value !== null);
 
   return (
-    <FormationSection id="about" formation="about" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
+    <section id="about" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
       <SectionTitle index="01">{t("about.title")}</SectionTitle>
       <Reveal className="max-w-xl">
         <p className="text-2xl leading-snug tracking-tight text-pretty md:text-[1.75rem]">{t("about.body")}</p>
@@ -33,6 +32,6 @@ export async function About() {
           </dl>
         </Reveal>
       )}
-    </FormationSection>
+    </section>
   );
 }

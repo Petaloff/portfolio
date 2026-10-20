@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { FormationSection } from "@/components/FormationSection";
 import { Reveal } from "@/components/Reveal";
 import { contacts } from "@/lib/site";
 import { SectionTitle } from "./SectionTitle";
@@ -7,16 +6,15 @@ import { SectionTitle } from "./SectionTitle";
 export async function Contact() {
   const t = await getTranslations("contact");
   return (
-    <FormationSection
+    <section
       id="contact"
-      formation="contact"
       className="mx-auto flex min-h-[70dvh] max-w-6xl flex-col px-4 pt-32 md:px-8"
     >
       <SectionTitle index="05">{t("title")}</SectionTitle>
       <Reveal>
         <p className="max-w-md text-muted">{t("lead")}</p>
       </Reveal>
-      <ul className="mt-12 max-w-xl divide-y divide-line border-y border-line">
+      <ul className="mt-12 divide-y divide-line border-y border-line">
         {contacts.map((c, i) => (
           <Reveal key={c.label} delay={i * 0.05}>
             <li>
@@ -33,6 +31,6 @@ export async function Contact() {
           </Reveal>
         ))}
       </ul>
-    </FormationSection>
+    </section>
   );
 }

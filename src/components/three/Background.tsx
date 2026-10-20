@@ -3,38 +3,30 @@
 import dynamic from "next/dynamic";
 import { useSyncExternalStore } from "react";
 import { usePathname } from "@/i18n/navigation";
-import { backdropFormations, sceneState, subscribeFormation } from "@/lib/scene";
 import { useRenderMode } from "@/lib/store";
 import { LiteVoxels } from "./LiteVoxels";
 
 const VoxelScene = dynamic(() => import("./VoxelScene"), { ssr: false });
 
-const getFormation = () => sceneState.formation;
+function subscribeScroll(onChange: () => void) {
+  addEventListener("scroll", onChange, { passive: true });
+  return () => removeEventListener("scroll", onChange);
+}
+const pastHero = () => scrollY > innerHeight * 0.9;
 
-// The scene lives on the home page only; inner pages are for reading
+// The voxel name lives at the top of the home page only
 export function Background({ name }: { name: string }) {
   const mode = useRenderMode();
   const pathname = usePathname();
-  const formation = useSyncExternalStore(subscribeFormation, getFormation, getFormation);
+  const hidden = useSyncExternalStore(subscribeScroll, pastHero, () => false);
   if (pathname !== "/") return null;
 
-  const hero = formation === "name";
-  const backdrop = backdropFormations.includes(formation);
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden>
-      {mode === "full" ? (
-        <div
-          className={`h-full w-full transition-opacity duration-700 ${
-            backdrop ? "opacity-10" : hero ? "opacity-100" : "opacity-25 md:opacity-100"
-          }`}
-        >
-          <VoxelScene name={name} />
-        </div>
-      ) : (
-        <div className={`transition-opacity duration-700 ${hero ? "opacity-100" : "opacity-0"}`}>
-          <LiteVoxels />
-        </div>
-      )}
+    <div
+      className={`pointer-events-none fixed inset-0 -z-10 transition-opacity duration-500 ${hidden ? "opacity-0" : ""}`}
+      aria-hidden
+    >
+      {mode === "full" ? <VoxelScene name={name} /> : <LiteVoxels />}
     </div>
   );
 }

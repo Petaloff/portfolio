@@ -2,25 +2,10 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { modeStore, themeStore, useRenderMode, useTheme } from "@/lib/store";
+import { modeStore, useRenderMode } from "@/lib/store";
 
 const button =
   "inline-flex h-9 items-center justify-center border border-line px-3 font-mono text-xs uppercase tracking-wider transition-colors hover:border-fg hover:text-fg";
-
-export function ThemeToggle() {
-  const t = useTranslations("theme");
-  const theme = useTheme();
-  return (
-    <button
-      type="button"
-      className={button}
-      aria-label={t("toggle")}
-      onClick={() => themeStore.set(theme === "dark" ? "light" : "dark")}
-    >
-      <span aria-hidden>{theme === "dark" ? "☾" : "☀"}</span>
-    </button>
-  );
-}
 
 export function ModeToggle() {
   const t = useTranslations("mode");

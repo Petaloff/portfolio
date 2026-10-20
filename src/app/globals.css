@@ -1,18 +1,6 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
 :root {
-  --bg: #f4f4f2;
-  --fg: #111111;
-  --muted: #6b6b68;
-  --line: #d9d9d4;
-  --surface: #ebebe7;
-  --accent: #3a7d44;
-  color-scheme: light;
-}
-
-[data-theme="dark"] {
   --bg: #0b0b0c;
   --fg: #ededeb;
   --muted: #8a8a86;
@@ -44,7 +32,6 @@ html.lenis body {
 body {
   background: var(--bg);
   color: var(--fg);
-  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 ::selection {

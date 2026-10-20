@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { FormationSection } from "@/components/FormationSection";
 import { ProjectGrid } from "@/components/ProjectGrid";
 import { Reveal } from "@/components/Reveal";
 import { getProjects } from "@/lib/content";
@@ -16,11 +15,11 @@ export async function Projects() {
   }));
 
   return (
-    <FormationSection id="projects" formation="projects" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
+    <section id="projects" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
       <SectionTitle index="02">{t("title")}</SectionTitle>
       <Reveal>
         <ProjectGrid projects={projects} />
       </Reveal>
-    </FormationSection>
+    </section>
   );
 }

@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { FormationSection } from "@/components/FormationSection";
 import { Reveal } from "@/components/Reveal";
 import { stack } from "@/lib/site";
 import { SectionTitle } from "./SectionTitle";
@@ -7,7 +6,7 @@ import { SectionTitle } from "./SectionTitle";
 export async function Stack() {
   const t = await getTranslations("stack");
   return (
-    <FormationSection id="stack" formation="stack" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
+    <section id="stack" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
       <SectionTitle index="03">{t("title")}</SectionTitle>
       <Reveal>
         <p className="mb-12 max-w-md text-muted">{t("lead")}</p>
@@ -27,6 +26,6 @@ export async function Stack() {
           </Reveal>
         ))}
       </div>
-    </FormationSection>
+    </section>
   );
 }

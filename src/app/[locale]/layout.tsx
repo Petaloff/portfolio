@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { locale as rootLocale } from "next/root-params";
 import { Analytics } from "@/components/Analytics";
 import { Footer } from "@/components/Footer";
@@ -16,9 +15,6 @@ import "../globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin", "cyrillic"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin", "cyrillic"] });
-
-// Runs before paint so the saved theme never flashes
-const themeScript = `try{document.documentElement.dataset.theme=localStorage.getItem("theme")==="light"?"light":"dark"}catch(e){}`;
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -46,14 +42,9 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
   return (
     <html
       lang={locale}
-      data-theme="dark"
-      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body className="min-h-dvh font-sans">
-        <Script id="theme" strategy="beforeInteractive">
-          {themeScript}
-        </Script>
         <NextIntlClientProvider>
           <SmoothScroll />
           <Background name={site.name.toUpperCase()} />

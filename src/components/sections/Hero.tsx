@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { DiscordStatus } from "@/components/DiscordStatus";
-import { FormationSection } from "@/components/FormationSection";
 import { Reveal } from "@/components/Reveal";
 import { LiteHint } from "@/components/ui/Controls";
 import { Link } from "@/i18n/navigation";
@@ -8,8 +7,8 @@ import { Link } from "@/i18n/navigation";
 export async function Hero() {
   const t = await getTranslations("hero");
   return (
-    <FormationSection
-      formation="name"
+    <section
+
       className="mx-auto flex min-h-dvh max-w-6xl flex-col justify-end px-4 pb-16 pt-32 md:px-8 md:pb-24"
     >
       <Reveal>
@@ -33,6 +32,6 @@ export async function Hero() {
         <DiscordStatus />
       </Reveal>
       <LiteHint />
-    </FormationSection>
+    </section>
   );
 }
