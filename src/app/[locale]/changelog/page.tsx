@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Reveal } from "@/components/Reveal";
 import { getReleases, type Release } from "@/lib/releases";
+import type { Locale } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("changelog");
-  return { title: t("title"), description: t("lead") };
+  const locale = (await getLocale()) as Locale;
+  return pageMetadata({ locale, path: "/changelog", title: t("title"), description: t("lead") });
 }
 
 const sourceLabel: Record<Release["source"], string> = { modrinth: "Modrinth", github: "GitHub" };

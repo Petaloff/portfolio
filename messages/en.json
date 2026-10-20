@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Petaloff — fullstack developer",
-    "description": "Discord bots, Minecraft mods and plugins, web. Portfolio and devlog."
+    "description": "Petaloff's portfolio: Discord bots, Minecraft mods and plugins on Fabric and Paper, web on Next.js. Project case studies and a devlog."
   },
   "nav": {
     "about": "About",
@@ -88,7 +88,8 @@
     "manage": "Analytics settings"
   },
   "privacy": {
-    "title": "Privacy"
+    "title": "Privacy",
+    "description": "What the site collects: anonymous analytics, PostHog only with consent, Discord status and comments."
   },
   "footer": {
     "made": "Built with Next.js and Three.js"

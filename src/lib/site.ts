@@ -1,6 +1,6 @@
 export const site = {
   name: "Petaloff",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://petaloff.vercel.app",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.petaloff.space",
   github: "Petaloff",
   modrinth: "Petaloff",
   curseforge: "Petaloff",

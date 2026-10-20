@@ -11,8 +11,8 @@ export async function GET(_req: Request, { params }: RouteContext<"/[locale]/blo
     .map(
       (p) => `<item>
   <title>${escape(p.title)}</title>
-  <link>${site.url}/${locale}/blog/${p.slug}</link>
-  <guid>${site.url}/${locale}/blog/${p.slug}</guid>
+  <link>${site.url}/${p.lang}/blog/${p.slug}</link>
+  <guid>${site.url}/${p.lang}/blog/${p.slug}</guid>
   <description>${escape(p.description)}</description>
   <pubDate>${new Date(p.date).toUTCString()}</pubDate>
   ${p.tags.map((t) => `<category>${escape(t)}</category>`).join("")}

@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense, ViewTransition } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import { Reveal } from "@/components/Reveal";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getProject, getProjectCase, getProjects } from "@/lib/content";
+import { absolute, breadcrumbs, pageMetadata, personRef } from "@/lib/seo";
+import { site } from "@/lib/site";
 
 type Params = PageProps<"/[locale]/projects/[slug]">["params"];
 
@@ -19,7 +22,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/projects
   const project = getProject((await params).slug);
   const locale = (await getLocale()) as Locale;
   if (!project) return {};
-  return { title: project.title, description: project.summary[locale] };
+  return pageMetadata({ locale, path: `/projects/${project.slug}`, title: project.title, description: project.summary[locale] });
 }
 
 export default async function ProjectPage({ params }: PageProps<"/[locale]/projects/[slug]">) {
@@ -43,9 +46,32 @@ async function ProjectCase({ params }: { params: Params }) {
   const Content = await getProjectCase(slug, locale);
   if (!project || !Content) notFound();
   const t = await getTranslations("projects");
+  const path = `/${locale}/projects/${project.slug}`;
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@graph": [
+            {
+              "@type": "CreativeWork",
+              name: project.title,
+              description: project.summary[locale],
+              url: absolute(path),
+              inLanguage: locale,
+              dateCreated: String(project.year),
+              keywords: project.tags.join(", "),
+              author: personRef,
+              ...(project.repo && { sameAs: `https://github.com/${project.repo}` }),
+            },
+            breadcrumbs([
+              { name: site.name, path: `/${locale}` },
+              { name: t("title"), path: `/${locale}#projects` },
+              { name: project.title, path },
+            ]),
+          ],
+        }}
+      />
       {/* No Reveal here: the header is the landing spot for the card morph */}
       <header className="mb-12 mt-8 border-b border-line pb-8">
         <ViewTransition name={`project-meta-${project.slug}`} share="morph" default="none">

@@ -6,11 +6,14 @@ import { GuestbookForm } from "@/components/guestbook/GuestbookForm";
 import { DeleteEntry } from "@/components/guestbook/DeleteEntry";
 import { Reveal } from "@/components/Reveal";
 import { getEntries, MAX_LENGTH, storageEnabled } from "@/lib/guestbook";
+import type { Locale } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
 import { login, logout } from "./actions";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("guestbook");
-  return { title: t("title"), description: t("lead") };
+  const locale = (await getLocale()) as Locale;
+  return pageMetadata({ locale, path: "/guestbook", title: t("title"), description: t("lead") });
 }
 
 const providerLabel = { github: "GitHub", discord: "Discord" } as const;
