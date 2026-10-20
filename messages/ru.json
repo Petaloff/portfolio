@@ -26,14 +26,16 @@
   "projects": {
     "title": "Проекты",
     "all": "Все",
-    "bot": "Боты",
-    "mod": "Моды",
-    "other": "Прочее",
     "case": "Читать кейс",
     "source": "Код",
     "back": "Все проекты",
     "downloads": "загрузок",
-    "stars": "звёзд"
+    "stars": "звёзд",
+    "discord": "Discord",
+    "minecraft": "Minecraft",
+    "web": "Web",
+    "clearTag": "×",
+    "empty": "Ничего не найдено."
   },
   "stats": {
     "title": "В цифрах",

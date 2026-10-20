@@ -26,14 +26,16 @@
   "projects": {
     "title": "Projects",
     "all": "All",
-    "bot": "Bots",
-    "mod": "Mods",
-    "other": "Other",
     "case": "Read case study",
     "source": "Source",
     "back": "All projects",
     "downloads": "downloads",
-    "stars": "stars"
+    "stars": "stars",
+    "discord": "Discord",
+    "minecraft": "Minecraft",
+    "web": "Web",
+    "clearTag": "×",
+    "empty": "Nothing found."
   },
   "stats": {
     "title": "By the numbers",

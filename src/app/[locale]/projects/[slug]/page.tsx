@@ -49,7 +49,7 @@ async function ProjectCase({ params }: { params: Params }) {
       <Reveal>
         <header className="mb-12 mt-8 border-b border-line pb-8">
           <p className="font-mono text-xs uppercase tracking-wider text-accent">
-            {t(project.kind)} · {project.year}
+            {project.categories.map((c) => t(c)).join(" · ")} · {project.year}
           </p>
           <h1 className="mt-4 text-5xl font-semibold tracking-tighter md:text-7xl">{project.title}</h1>
           <p className="mt-6 text-lg text-muted">{project.summary[locale]}</p>

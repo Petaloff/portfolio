@@ -1,10 +1,11 @@
 // Draft entries: replace with your real projects. `caseStudy: true` means
 // there are content/projects/<slug>.<locale>.mdx files with the full story.
-export type ProjectKind = "bot" | "mod" | "other";
+// A project can belong to several categories, e.g. a Discord bot with a web dashboard
+export type ProjectCategory = "discord" | "minecraft" | "web";
 
 export type Project = {
   slug: string;
-  kind: ProjectKind;
+  categories: ProjectCategory[];
   title: string;
   summary: { ru: string; en: string };
   tags: string[];
@@ -18,7 +19,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "example-bot",
-    kind: "bot",
+    categories: ["discord"],
     title: "Example Bot",
     summary: {
       ru: "Черновик: Discord-бот для модерации и музыки. Замените на реальный проект.",
@@ -30,7 +31,7 @@ export const projects: Project[] = [
   },
   {
     slug: "example-mod",
-    kind: "mod",
+    categories: ["minecraft"],
     title: "Example Mod",
     summary: {
       ru: "Черновик: мод на Fabric, добавляющий новые механики. Замените на реальный проект.",
@@ -42,7 +43,7 @@ export const projects: Project[] = [
   },
   {
     slug: "example-plugin",
-    kind: "mod",
+    categories: ["minecraft"],
     title: "Example Plugin",
     summary: {
       ru: "Черновик: плагин для Paper-сервера.",
@@ -53,7 +54,7 @@ export const projects: Project[] = [
   },
   {
     slug: "portfolio",
-    kind: "other",
+    categories: ["web"],
     title: "Portfolio",
     summary: {
       ru: "Этот сайт: Next.js 16, React Three Fiber, GSAP и воксели.",
