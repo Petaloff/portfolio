@@ -63,11 +63,12 @@ function Voxels({ name }: { name: string }) {
     f.y += (sceneState.pointer.y - f.y) * ease;
     f.weight += ((atTop ? 1 : 0) - f.weight) * (1 - Math.exp(-dt * 4));
 
-    // Name across the top with a slight tilt towards the cursor, carried up
-    // with the page as it scrolls away
+    // Name across the top with a slight tilt towards the cursor
     const fit = Math.min(1, (viewport.width * 0.8) / layout.width);
     g.scale.setScalar(fit);
-    g.position.y = viewport.height * 0.26 + scrolled * viewport.height;
+    // Stays pinned for the first stretch of scrolling, then trails after the page
+    const lift = Math.max(0, scrollY - innerHeight * 0.35) / innerHeight;
+    g.position.y = THREE.MathUtils.damp(g.position.y, viewport.height * (0.26 + lift), 6, dt);
     g.rotation.y = f.x * 0.12 * f.weight;
     g.rotation.x = f.y * 0.08 * f.weight;
 
