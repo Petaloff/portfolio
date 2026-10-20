@@ -3,9 +3,9 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { sceneState } from "@/lib/scene";
+import { sceneState, sectionLetters } from "@/lib/scene";
 import { useTheme } from "@/lib/store";
-import { buildLayouts, COUNT, SIZE } from "./formations";
+import { buildLayouts, COUNT, SIZE, type Layout } from "./formations";
 
 const ACCENT_EVERY = 11;
 
@@ -23,7 +23,10 @@ function Voxels({ name }: { name: string }) {
   const theme = useTheme();
   const { viewport } = useThree();
 
-  const { layouts, nameWidth } = useMemo(() => buildLayouts(name), [name]);
+  const layouts = useMemo(() => buildLayouts(name), [name]);
+  const { nameWidth, letterRadius } = layouts;
+  // Behind full-width sections the last shown letter simply stays put
+  const lastLetter = useRef<Layout>(layouts.letters[name[0]]);
   // Animated per-frame buffers; start scattered so the name assembles on load
   const current = useRef<{ positions: Float32Array; scales: Float32Array } | null>(null);
   // Per-cube easing speed gives the morph a rolling, wave-like feel
@@ -42,11 +45,16 @@ function Voxels({ name }: { name: string }) {
     const m = mesh.current;
     const g = group.current;
     if (!m || !g) return;
-    const target = layouts[sceneState.formation];
+    const letters = sectionLetters[sceneState.formation];
+    if (letters) {
+      const index = Math.min(letters.length - 1, Math.floor(sceneState.progress * letters.length));
+      lastLetter.current = layouts.letters[letters[index]] ?? lastLetter.current;
+    }
+    const target = sceneState.formation === "name" ? layouts.name : lastLetter.current;
     const dt = Math.min(delta, 1 / 30);
     const t = state.clock.elapsedTime;
     current.current ??= {
-      positions: Float32Array.from(layouts.contact.positions, (v) => v * 2.5),
+      positions: Float32Array.from({ length: COUNT * 3 }, (_, i) => Math.sin(i * 12.9898) * 12),
       scales: new Float32Array(COUNT),
     };
     const pos = current.current.positions;
@@ -78,19 +86,19 @@ function Voxels({ name }: { name: string }) {
       fit = Math.min(1, (viewport.width * 0.8) / nameWidth);
       y0 = viewport.height * 0.26;
     } else if (wide) {
-      fit = Math.min(1.1, (viewport.width * 0.15) / target.radius, (viewport.height * 0.36) / target.radius);
+      fit = Math.min(1.4, (viewport.width * 0.16) / letterRadius, (viewport.height * 0.38) / letterRadius);
       x0 = viewport.width * 0.29;
     } else {
-      fit = Math.min(1, (viewport.width * 0.42) / target.radius);
+      fit = Math.min(1.2, (viewport.width * 0.42) / letterRadius);
     }
     g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, fit, 3, dt));
     g.position.x = THREE.MathUtils.damp(g.position.x, x0, 2.5, dt);
     g.position.y = THREE.MathUtils.damp(g.position.y, y0, 2.5, dt);
     const { x, y } = sceneState.pointer;
-    // The name stays mostly flat to remain readable; other shapes turn slowly
+    // Letters sway enough to show their depth but always stay readable
     const flat = sceneState.formation === "name";
-    const spin = flat ? Math.sin(t * 0.2) * 0.06 : t * 0.25;
-    const tilt = flat ? 0 : 0.45;
+    const spin = flat ? Math.sin(t * 0.2) * 0.06 : Math.sin(t * 0.6) * 0.45;
+    const tilt = flat ? 0 : 0.12;
     const targetY = spin + x * (flat ? 0.15 : 0.3);
     // Ease along the shortest arc so switching shapes never whips around
     const diff = THREE.MathUtils.euclideanModulo(targetY - g.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
