@@ -33,7 +33,13 @@ export function SkinViewer({ username }: { username: string }) {
       viewer.animation = new IdleAnimation();
       viewer.controls.enableZoom = false;
       viewer.loadSkin(`https://mc-heads.net/skin/${username}`).catch(() => setFailed(true));
-      dispose = () => viewer.dispose();
+      // skinview3d's dispose() still reaches for fxaaPass.fsQuad, which our newer
+      // three renamed to _fsQuad; alias it so cleanup on navigation doesn't throw
+      const pass = viewer.fxaaPass as unknown as { fsQuad?: unknown; _fsQuad?: unknown };
+      pass.fsQuad ??= pass._fsQuad;
+      dispose = () => {
+        if (!viewer.disposed) viewer.dispose();
+      };
     });
     return () => {
       disposed = true;
