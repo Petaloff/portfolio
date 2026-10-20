@@ -1,37 +1,40 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { Reveal } from "@/components/Reveal";
 import { getLiveStats } from "@/lib/live";
-import { SectionTitle } from "./SectionTitle";
+import { EditorWindow } from "./EditorWindow";
 
 export async function About() {
   const t = await getTranslations();
   const locale = await getLocale();
   const stats = await getLiveStats();
   const items = [
-    { value: stats.downloads, label: t("stats.downloads") },
-    { value: stats.stars, label: t("stats.stars") },
-    { value: stats.repos, label: t("stats.repos") },
-    { value: stats.followers, label: t("stats.followers") },
+    { key: "downloads", value: stats.downloads, label: t("stats.downloads") },
+    { key: "stars", value: stats.stars, label: t("stats.stars") },
+    { key: "repos", value: stats.repos, label: t("stats.repos") },
+    { key: "followers", value: stats.followers, label: t("stats.followers") },
   ].filter((i) => i.value !== null);
 
   return (
-    <section id="about" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
-      <SectionTitle index="01">{t("about.title")}</SectionTitle>
-      <Reveal className="max-w-xl">
+    <EditorWindow id="about" title={t("about.title")}>
+      <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-start">
         <p className="text-2xl leading-snug tracking-tight text-pretty md:text-[1.75rem]">{t("about.body")}</p>
-      </Reveal>
-      {items.length > 0 && (
-        <Reveal delay={0.1}>
-          <dl className="mt-16 grid max-w-xl grid-cols-2 gap-px border border-line bg-line">
-            {items.map((i) => (
-              <div key={i.label} className="bg-bg p-6">
-                <dt className="font-mono text-xs text-muted">{i.label}</dt>
-                <dd className="mt-2 text-4xl font-semibold tracking-tight">{i.value!.toLocaleString(locale)}</dd>
+        {items.length > 0 && (
+          // Live numbers presented as the JSON they come from
+          <div className="border border-line bg-bg/70 p-5 font-mono text-sm leading-7">
+            <div className="mb-2 text-xs text-muted">{"// stats.json · live, refreshed hourly"}</div>
+            <div className="text-muted">{"{"}</div>
+            {items.map((i, n) => (
+              <div key={i.key} className="pl-5" title={i.label}>
+                <span className="text-sky-300">&quot;{i.key}&quot;</span>
+                <span className="text-muted">: </span>
+                <span className="text-accent">{i.value!.toLocaleString(locale)}</span>
+                <span className="text-muted">{n < items.length - 1 ? "," : ""}</span>
+                <span className="ml-3 hidden text-xs text-muted/70 sm:inline">{`// ${i.label}`}</span>
               </div>
             ))}
-          </dl>
-        </Reveal>
-      )}
-    </section>
+            <div className="text-muted">{"}"}</div>
+          </div>
+        )}
+      </div>
+    </EditorWindow>
   );
 }

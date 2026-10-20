@@ -1,36 +1,42 @@
 import { getTranslations } from "next-intl/server";
-import { Reveal } from "@/components/Reveal";
 import { contacts } from "@/lib/site";
-import { SectionTitle } from "./SectionTitle";
+import { EditorWindow } from "./EditorWindow";
 
+// Contacts as a terminal session: one command per channel
 export async function Contact() {
   const t = await getTranslations("contact");
   return (
-    <section
-      id="contact"
-      className="mx-auto flex min-h-[70dvh] max-w-6xl flex-col px-4 pt-32 md:px-8"
-    >
-      <SectionTitle index="05">{t("title")}</SectionTitle>
-      <Reveal>
-        <p className="max-w-md text-muted">{t("lead")}</p>
-      </Reveal>
-      <ul className="mt-12 divide-y divide-line border-y border-line">
-        {contacts.map((c, i) => (
-          <Reveal key={c.label} delay={i * 0.05}>
-            <li>
+    <EditorWindow id="contact" title={t("title")} className="pb-10 md:pb-16">
+      <div className="font-mono">
+        <p className="text-sm text-muted">
+          <span className="text-accent">petaloff@dev</span>:~$ cat README
+        </p>
+        <p className="mb-8 mt-2 text-sm">{t("lead")}</p>
+        <ul className="space-y-1">
+          {contacts.map((c) => (
+            <li key={c.label}>
               <a
                 href={c.href}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-baseline justify-between py-5 text-3xl font-semibold tracking-tight md:text-5xl"
+                className="group flex flex-wrap items-baseline gap-x-3 py-2 text-xl md:text-3xl"
               >
-                <span className="transition-transform duration-500 group-hover:translate-x-3">{c.label}</span>
-                <span className="text-muted transition-colors group-hover:text-accent">↗</span>
+                <span className="text-accent">$</span>
+                <span className="text-muted">open</span>
+                <span className="font-sans font-semibold tracking-tight transition-colors group-hover:text-accent">
+                  {c.label.toLowerCase()}
+                </span>
+                <span className="text-sm text-muted opacity-0 transition-opacity group-hover:opacity-100">
+                  → {c.href.replace(/^(https?:\/\/|mailto:)/, "")}
+                </span>
               </a>
             </li>
-          </Reveal>
-        ))}
-      </ul>
-    </section>
+          ))}
+        </ul>
+        <p className="mt-6 text-sm text-muted">
+          <span className="text-accent">petaloff@dev</span>:~$ <span className="inline-block h-4 w-2 translate-y-0.5 animate-pulse bg-fg" />
+        </p>
+      </div>
+    </EditorWindow>
   );
 }

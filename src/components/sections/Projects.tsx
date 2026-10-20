@@ -1,9 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { ProjectGrid } from "@/components/ProjectGrid";
-import { Reveal } from "@/components/Reveal";
 import { getProjects } from "@/lib/content";
 import { getLiveStats } from "@/lib/live";
-import { SectionTitle } from "./SectionTitle";
+import { EditorWindow } from "./EditorWindow";
 
 export async function Projects() {
   const t = await getTranslations("projects");
@@ -15,11 +14,8 @@ export async function Projects() {
   }));
 
   return (
-    <section id="projects" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
-      <SectionTitle index="02">{t("title")}</SectionTitle>
-      <Reveal>
-        <ProjectGrid projects={projects} />
-      </Reveal>
-    </section>
+    <EditorWindow id="projects" title={t("title")}>
+      <ProjectGrid projects={projects} />
+    </EditorWindow>
   );
 }

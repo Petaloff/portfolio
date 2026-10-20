@@ -7,6 +7,15 @@ import { sceneState } from "@/lib/scene";
 import { buildName, COUNT, SIZE } from "./formations";
 
 const ACCENT_EVERY = 11;
+// Phones get a coarser grid: fewer, bigger cubes stay crisp at small sizes
+const NARROW_BUDGET = 360;
+
+// R3F 9 still creates a THREE.Clock internally, which three r183+ flags as
+// deprecated on every mount. The scene itself uses THREE.Timer, so mute just that notice.
+THREE.setConsoleFunction((type, message, ...params) => {
+  if (type === "warn" && message.startsWith("THREE.Clock:")) return;
+  console[type as "log" | "warn" | "error"](message, ...params);
+});
 
 function readColors() {
   const style = getComputedStyle(document.documentElement);
@@ -20,8 +29,12 @@ function Voxels({ name }: { name: string }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const group = useRef<THREE.Group>(null);
   const { viewport } = useThree();
+  const narrow = viewport.aspect < 1;
+  // Touch screens have no hover, so the cursor effects stay off there
+  const coarse = useMemo(() => matchMedia("(pointer: coarse)").matches, []);
+  const timer = useMemo(() => new THREE.Timer(), []);
 
-  const layout = useMemo(() => buildName(name), [name]);
+  const layout = useMemo(() => buildName(name, narrow ? NARROW_BUDGET : COUNT), [name, narrow]);
   // Animated per-frame buffers; start scattered so the name assembles on load
   const current = useRef<{ positions: Float32Array; scales: Float32Array } | null>(null);
   // Smoothed pointer and how strongly the name reacts to it (fades out on scroll)
@@ -41,12 +54,13 @@ function Voxels({ name }: { name: string }) {
     if (m.instanceColor) m.instanceColor.needsUpdate = true;
   }, []);
 
-  useFrame((state, delta) => {
+  useFrame(() => {
     const m = mesh.current;
     const g = group.current;
     if (!m || !g) return;
-    const dt = Math.min(delta, 1 / 30);
-    const t = state.clock.elapsedTime;
+    timer.update();
+    const dt = Math.min(timer.getDelta(), 1 / 30);
+    const t = timer.getElapsed();
     current.current ??= {
       positions: Float32Array.from({ length: COUNT * 3 }, (_, i) => Math.sin(i * 12.9898) * 12),
       scales: new Float32Array(COUNT),
@@ -56,7 +70,7 @@ function Voxels({ name }: { name: string }) {
 
     // The name only reacts to the cursor while the page is at the top
     const scrolled = Math.min(1, scrollY / innerHeight);
-    const atTop = scrolled < 0.05;
+    const atTop = scrolled < 0.05 && !coarse;
     const f = follow.current;
     const ease = 1 - Math.exp(-dt * 6);
     f.x += (sceneState.pointer.x - f.x) * ease;
@@ -150,7 +164,7 @@ export default function VoxelScene({ name }: { name: string }) {
   return (
     <Canvas
       camera={{ position: [0, 0, 30], fov: 16 }}
-      dpr={[1, 1.75]}
+      dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       aria-hidden
     >

@@ -6,8 +6,9 @@ const UNIT = SIZE * 1.06;
 
 type Point = [number, number, number];
 
-// Rasterise text on a 2D canvas and turn filled pixels into voxels centred on the origin
-export function buildName(text: string) {
+// Rasterise text on a 2D canvas and turn filled pixels into voxels centred on
+// the origin. A smaller budget gives a coarser grid of relatively bigger cubes.
+export function buildName(text: string, budget = COUNT) {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
   const font = "800 64px system-ui, sans-serif";
@@ -20,7 +21,7 @@ export function buildName(text: string) {
   ctx.fillText(text, 4, canvas.height / 2);
 
   const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  // Pick the finest sampling step that still fits within COUNT
+  // Pick the finest sampling step that still fits within the cube budget
   let step = 1;
   let pixels: [number, number][] = [];
   for (; step < 12; step++) {
@@ -28,7 +29,7 @@ export function buildName(text: string) {
     for (let y = 0; y < canvas.height; y += step)
       for (let x = 0; x < canvas.width; x += step)
         if (data[(y * canvas.width + x) * 4 + 3] > 128) pixels.push([x / step, y / step]);
-    if (pixels.length <= COUNT) break;
+    if (pixels.length <= budget) break;
   }
 
   const xs = pixels.map((p) => p[0]);
