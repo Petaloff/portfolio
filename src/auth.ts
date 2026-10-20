@@ -10,7 +10,8 @@ const providers = [
 ];
 
 export const authProviders = providers.map((p) => p({}).id as "github" | "discord");
-export const authEnabled = !!process.env.AUTH_SECRET && providers.length > 0;
+export const authSecret = !!(process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET);
+export const authEnabled = authSecret && providers.length > 0;
 
 declare module "next-auth" {
   interface Session {

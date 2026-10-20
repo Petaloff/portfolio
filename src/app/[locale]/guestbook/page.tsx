@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { auth, authEnabled, authProviders } from "@/auth";
+import { auth, authEnabled, authProviders, authSecret } from "@/auth";
 import { GuestbookForm } from "@/components/guestbook/GuestbookForm";
 import { DeleteEntry } from "@/components/guestbook/DeleteEntry";
 import { Reveal } from "@/components/Reveal";
@@ -56,6 +56,12 @@ export default async function GuestbookPage() {
   const locale = await getLocale();
   const entries = await getEntries();
   const enabled = authEnabled && storageEnabled;
+  // Names only, never values: tells the owner which setting is still missing
+  const missing = [
+    !authSecret && "AUTH_SECRET",
+    authProviders.length === 0 && "AUTH_GITHUB_ID / AUTH_DISCORD_ID",
+    !storageEnabled && "KV_REST_API_URL + KV_REST_API_TOKEN",
+  ].filter(Boolean);
 
   return (
     <div className="mx-auto max-w-2xl px-4 pb-24 pt-36 md:px-8">
@@ -70,7 +76,10 @@ export default async function GuestbookPage() {
             <Composer />
           </Suspense>
         ) : (
-          <p className="font-mono text-sm text-muted"># {t("disabled")}</p>
+          <p className="font-mono text-sm text-muted">
+            # {t("disabled")}
+            <span className="mt-2 block text-xs opacity-70">missing: {missing.join(", ")}</span>
+          </p>
         )}
       </div>
 
