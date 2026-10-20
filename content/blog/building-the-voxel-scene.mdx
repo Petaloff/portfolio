@@ -1,0 +1,17 @@
+export const meta = {
+  title: "Building the voxel scene",
+  description: "How a few hundred instanced cubes morph between shapes as you scroll.",
+  date: "2026-10-20",
+  lang: "en",
+  tags: ["three.js", "devlog"],
+};
+
+The hero scene is a single `InstancedMesh`. Every section of the page defines a
+target formation, and each frame the cubes ease towards it.
+
+## Formations
+
+1. Text sampled from a 2D canvas
+2. A stack of card-shaped slabs
+3. A grid, one cube per tool in the stack
+4. Scattered debris near the contact section
