@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locale as rootLocale } from "next/root-params";
 import { Analytics } from "@/components/Analytics";
+import { EasterEgg } from "@/components/EasterEgg";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SmoothScroll } from "@/components/SmoothScroll";
@@ -52,6 +53,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
           <main id="main">{children}</main>
           <Footer />
           <Analytics />
+          <EasterEgg />
         </NextIntlClientProvider>
       </body>
     </html>

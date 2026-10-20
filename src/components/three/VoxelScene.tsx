@@ -99,6 +99,10 @@ function Voxels({ name }: { name: string }) {
     }
     const live = (ripples.current = ripples.current.filter((r) => t - r.t0 < 2.5));
 
+    // Easter egg: blast every cube outwards, then let it drift back home
+    const age = (performance.now() - sceneState.burstAt) / 1000;
+    const blast = age < 4 ? 7 * Math.exp(-age * 1.4) * (1 - Math.exp(-age * 10)) : 0;
+
     for (let i = 0; i < COUNT; i++) {
       // Base position eases into the name (assembly on load)
       const k = 1 - Math.exp(-dt * speeds[i]);
@@ -129,10 +133,14 @@ function Voxels({ name }: { name: string }) {
       const breath = (Math.sin(t * 1.8 - tx * 0.45) * 0.5 + 0.5) * 0.08;
 
       const spread = lens * 0.4 + wave * 0.22;
+      // Stable pseudo-random direction per cube for the blast
+      const bx = Math.sin(i * 12.9898) * blast;
+      const by = Math.sin(i * 78.233) * blast;
+      const bz = Math.sin(i * 37.719) * blast;
       dummy.position.set(
-        pos[j] + (dx / d) * spread,
-        pos[j + 1] + (dy / d) * spread,
-        pos[j + 2] + lens * 1.1 + wave * 0.8,
+        pos[j] + (dx / d) * spread + bx,
+        pos[j + 1] + (dy / d) * spread + by,
+        pos[j + 2] + lens * 1.1 + wave * 0.8 + bz,
       );
       dummy.scale.setScalar(scl[i] * (1 + lens * 0.45 + wave * 0.45 + breath));
       dummy.updateMatrix();

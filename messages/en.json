@@ -111,5 +111,8 @@
     "title": "Changelog",
     "lead": "Every mod release from Modrinth and project release from GitHub in one feed. Refreshed hourly.",
     "empty": "No releases yet, or the sources are unavailable right now."
+  },
+  "easter": {
+    "given": "Gave 64 [Voxel] to You"
   }
 }
