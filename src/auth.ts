@@ -4,12 +4,14 @@ import GitHub from "next-auth/providers/github";
 import { site } from "@/lib/site";
 
 // Only providers with credentials set are offered on the guestbook
+// Discord now returns an `iss` parameter on the callback (RFC 9207); without a
+// matching issuer Auth.js rejects it and the sign-in ends in a Configuration error
 const providers = [
-  ...(process.env.AUTH_GITHUB_ID ? [GitHub] : []),
-  ...(process.env.AUTH_DISCORD_ID ? [Discord] : []),
+  ...(process.env.AUTH_GITHUB_ID ? [GitHub({})] : []),
+  ...(process.env.AUTH_DISCORD_ID ? [Discord({ issuer: "https://discord.com" })] : []),
 ];
 
-export const authProviders = providers.map((p) => p({}).id as "github" | "discord");
+export const authProviders = providers.map((p) => p.id as "github" | "discord");
 export const authSecret = !!(process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET);
 export const authEnabled = authSecret && providers.length > 0;
 
