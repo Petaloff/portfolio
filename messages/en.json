@@ -9,7 +9,8 @@
     "stack": "Stack",
     "blog": "Blog",
     "contact": "Contact",
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "minecraft": "Minecraft"
   },
   "hero": {
     "kicker": "Fullstack developer",
@@ -88,5 +89,13 @@
   },
   "footer": {
     "made": "Built with Next.js and Three.js"
+  },
+  "minecraft": {
+    "title": "Minecraft",
+    "lead": "My skin and the server where I test my mods.",
+    "planned": "planned",
+    "online": "online",
+    "offline": "offline",
+    "drag": "drag to rotate"
   }
 }

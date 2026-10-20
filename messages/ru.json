@@ -9,7 +9,8 @@
     "stack": "Стек",
     "blog": "Блог",
     "contact": "Контакты",
-    "skip": "Перейти к содержимому"
+    "skip": "Перейти к содержимому",
+    "minecraft": "Minecraft"
   },
   "hero": {
     "kicker": "Fullstack-разработчик",
@@ -88,5 +89,13 @@
   },
   "footer": {
     "made": "Сделано на Next.js и Three.js"
+  },
+  "minecraft": {
+    "title": "Minecraft",
+    "lead": "Мой скин и сервер, на котором тестирую моды.",
+    "planned": "планируется",
+    "online": "онлайн",
+    "offline": "офлайн",
+    "drag": "покрутите мышкой"
   }
 }

@@ -7,6 +7,7 @@ const files = [
   { id: "about", name: "about.md", lang: "Markdown" },
   { id: "projects", name: "projects.tsx", lang: "TypeScript JSX" },
   { id: "stack", name: "stack.ts", lang: "TypeScript" },
+  { id: "minecraft", name: "server.properties", lang: "Properties" },
   { id: "blog", name: "blog.log", lang: "Git Log" },
   { id: "contact", name: "contact.sh", lang: "Shell" },
 ] as const;
@@ -17,6 +18,7 @@ const commentPrefix: Record<FileId, string> = {
   about: "#",
   projects: "//",
   stack: "//",
+  minecraft: "#",
   blog: "#",
   contact: "$",
 };
