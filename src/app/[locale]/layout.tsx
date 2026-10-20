@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { locale as rootLocale } from "next/root-params";
 import { Analytics } from "@/components/Analytics";
 import { Footer } from "@/components/Footer";
@@ -49,10 +50,10 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="min-h-dvh font-sans">
+        <Script id="theme" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
         <NextIntlClientProvider>
           <SmoothScroll />
           <Background name={site.name.toUpperCase()} />

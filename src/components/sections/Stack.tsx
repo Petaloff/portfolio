@@ -12,7 +12,7 @@ export async function Stack() {
       <Reveal>
         <p className="mb-12 max-w-md text-muted">{t("lead")}</p>
       </Reveal>
-      <div className="grid max-w-2xl gap-10 sm:grid-cols-2">
+      <div className="grid max-w-xl gap-10 sm:grid-cols-2">
         {stack.map((group, i) => (
           <Reveal key={group.group} delay={i * 0.08}>
             <h3 className="mb-4 font-mono text-xs uppercase tracking-wider text-accent">{group.group}</h3>

@@ -16,7 +16,7 @@ export async function Contact() {
       <Reveal>
         <p className="max-w-md text-muted">{t("lead")}</p>
       </Reveal>
-      <ul className="mt-12 divide-y divide-line border-y border-line">
+      <ul className="mt-12 max-w-xl divide-y divide-line border-y border-line">
         {contacts.map((c, i) => (
           <Reveal key={c.label} delay={i * 0.05}>
             <li>

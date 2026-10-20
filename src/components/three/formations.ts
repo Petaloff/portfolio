@@ -3,11 +3,15 @@ import type { Formation } from "@/lib/scene";
 export const COUNT = 900;
 export const SIZE = 0.22;
 
+// Voxel pitch: a hair over the cube size so shapes read as solid blocks
+const UNIT = SIZE * 1.06;
+
 // Each formation is COUNT xyz positions plus a per-cube scale (0 hides it)
-export type Layout = { positions: Float32Array; scales: Float32Array };
+// and the radius of its visible part, used to fit it on screen
+export type Layout = { positions: Float32Array; scales: Float32Array; radius: number };
 
 function empty(): Layout {
-  return { positions: new Float32Array(COUNT * 3), scales: new Float32Array(COUNT) };
+  return { positions: new Float32Array(COUNT * 3), scales: new Float32Array(COUNT), radius: 1 };
 }
 
 // Deterministic PRNG so layouts are stable between renders
@@ -29,6 +33,7 @@ function fill(points: [number, number, number][], scatterSeed: number): Layout {
       const [x, y, z] = points[entry[1]];
       out.positions.set([x, y, z], i * 3);
       out.scales[i] = 1;
+      out.radius = Math.max(out.radius, Math.hypot(x, y, z) + SIZE);
     } else {
       // Spare cubes shrink away somewhere near the centre
       out.positions.set([(rand() - 0.5) * 4, (rand() - 0.5) * 4, (rand() - 0.5) * 4], i * 3);
@@ -65,66 +70,63 @@ function textPoints(text: string): [number, number, number][] {
   // One cube per sample, spaced on a voxel grid
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
-  const unit = SIZE * 1.05;
+  const unit = UNIT;
   return pts.map(([x, y]) => [((x - cx) / step) * unit, (-(y - cy) / step) * unit, 0]);
 }
 
 function hollowCube(n: number): [number, number, number][] {
   const pts: [number, number, number][] = [];
-  const unit = SIZE * 1.6;
   const half = (n - 1) / 2;
   for (let x = 0; x < n; x++)
     for (let y = 0; y < n; y++)
-      for (let z = 0; z < n; z++) {
-        const edge = [x, y, z].filter((v) => v === 0 || v === n - 1).length;
-        if (edge >= 1) pts.push([(x - half) * unit, (y - half) * unit, (z - half) * unit]);
-      }
+      for (let z = 0; z < n; z++)
+        if ([x, y, z].some((v) => v === 0 || v === n - 1))
+          pts.push([(x - half) * UNIT, (y - half) * UNIT, (z - half) * UNIT]);
   return pts;
 }
 
 function cardStack(): [number, number, number][] {
   const pts: [number, number, number][] = [];
-  const unit = SIZE * 1.1;
-  for (let c = 0; c < 5; c++)
-    for (let x = 0; x < 11; x++)
-      for (let y = 0; y < 7; y++)
-        pts.push([(x - 5 + c * 1.6) * unit, (y - 3 - c * 1.2) * unit, -c * 6 * unit]);
+  for (let c = 0; c < 4; c++)
+    for (let x = 0; x < 10; x++)
+      for (let y = 0; y < 6; y++)
+        pts.push([(x - 4.5 + (c - 1.5) * 1.5) * UNIT, (y - 2.5 - (c - 1.5) * 1.5) * UNIT, -(c - 1.5) * 4 * UNIT]);
   return pts;
 }
 
 function towers(): [number, number, number][] {
   const pts: [number, number, number][] = [];
-  const unit = SIZE * 1.15;
   const rand = rng(7);
   for (let gx = 0; gx < 4; gx++)
     for (let gz = 0; gz < 4; gz++) {
-      const height = 2 + Math.floor(rand() * 9);
+      const height = 2 + Math.floor(rand() * 8);
       for (let h = 0; h < height; h++)
         for (let dx = 0; dx < 2; dx++)
           for (let dz = 0; dz < 2; dz++)
-            pts.push([(gx * 3 + dx - 5) * unit, (h - 4) * unit, (gz * 3 + dz - 5) * unit]);
+            pts.push([(gx * 3 + dx - 5) * UNIT, (h - 5) * UNIT, (gz * 3 + dz - 5) * UNIT]);
     }
   return pts;
 }
 
 function ring(): [number, number, number][] {
   const pts: [number, number, number][] = [];
-  const unit = SIZE * 1.1;
-  for (let i = 0; i < 360; i++) {
-    const a = (i / 360) * Math.PI * 2;
-    const r = 9 + (i % 3);
-    pts.push([Math.cos(a) * r * unit, Math.sin(a) * r * unit * 0.55, ((i % 5) - 2) * unit]);
-  }
+  const r = 12;
+  for (let x = -r; x <= r; x++)
+    for (let y = -r; y <= r; y++) {
+      const d = Math.hypot(x, y);
+      if (d > r - 2 && d <= r) for (let z = 0; z < 2; z++) pts.push([x * UNIT, y * UNIT, (z - 0.5) * UNIT]);
+    }
   return pts;
 }
 
+// A loose cloud of cubes, as if the shape just burst apart
 function scatter(): [number, number, number][] {
   const rand = rng(42);
-  return Array.from({ length: COUNT }, () => {
-    const r = 3 + rand() * 6;
+  return Array.from({ length: 420 }, () => {
+    const r = 1.2 + rand() * 2.4;
     const a = rand() * Math.PI * 2;
     const b = Math.acos(rand() * 2 - 1);
-    return [r * Math.sin(b) * Math.cos(a), r * Math.sin(b) * Math.sin(a) * 0.7, r * Math.cos(b) - 2];
+    return [r * Math.sin(b) * Math.cos(a), r * Math.sin(b) * Math.sin(a), r * Math.cos(b)];
   });
 }
 

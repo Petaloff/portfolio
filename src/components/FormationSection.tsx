@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef, type ReactNode } from "react";
-import { sceneState, type Formation } from "@/lib/scene";
+import { setFormation, type Formation } from "@/lib/scene";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -28,7 +28,7 @@ export function FormationSection({
       start: "top center",
       end: "bottom center",
       onToggle: (self) => {
-        if (self.isActive) sceneState.formation = formation;
+        if (self.isActive) setFormation(formation);
       },
     });
   });

@@ -18,12 +18,12 @@ export async function About() {
   return (
     <FormationSection id="about" formation="about" className="mx-auto max-w-6xl px-4 py-32 md:px-8">
       <SectionTitle index="01">{t("about.title")}</SectionTitle>
-      <Reveal className="max-w-2xl">
-        <p className="text-2xl leading-snug tracking-tight text-pretty md:text-3xl">{t("about.body")}</p>
+      <Reveal className="max-w-xl">
+        <p className="text-2xl leading-snug tracking-tight text-pretty md:text-[1.75rem]">{t("about.body")}</p>
       </Reveal>
       {items.length > 0 && (
         <Reveal delay={0.1}>
-          <dl className="mt-16 grid max-w-2xl grid-cols-2 gap-px border border-line bg-line">
+          <dl className="mt-16 grid max-w-xl grid-cols-2 gap-px border border-line bg-line">
             {items.map((i) => (
               <div key={i.label} className="bg-bg p-6">
                 <dt className="font-mono text-xs text-muted">{i.label}</dt>

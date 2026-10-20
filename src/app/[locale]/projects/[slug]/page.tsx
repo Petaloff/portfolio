@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { Reveal } from "@/components/Reveal";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getProject, getProjectCase, getProjects } from "@/lib/content";
+
+type Params = PageProps<"/[locale]/projects/[slug]">["params"];
 
 export function generateStaticParams() {
   return getProjects()
@@ -20,6 +23,20 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/projects
 }
 
 export default async function ProjectPage({ params }: PageProps<"/[locale]/projects/[slug]">) {
+  const t = await getTranslations("projects");
+  return (
+    <article className="mx-auto max-w-3xl px-4 pb-24 pt-36 md:px-8">
+      <Link href="/#projects" className="font-mono text-xs text-muted hover:text-fg">
+        ← {t("back")}
+      </Link>
+      <Suspense fallback={<div className="mt-8 h-64 animate-pulse bg-surface" />}>
+        <ProjectCase params={params} />
+      </Suspense>
+    </article>
+  );
+}
+
+async function ProjectCase({ params }: { params: Params }) {
   const { slug } = await params;
   const locale = (await getLocale()) as Locale;
   const project = getProject(slug);
@@ -28,10 +45,7 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
   const t = await getTranslations("projects");
 
   return (
-    <article className="mx-auto max-w-3xl px-4 pb-24 pt-36 md:px-8">
-      <Link href="/#projects" className="font-mono text-xs text-muted hover:text-fg">
-        ← {t("back")}
-      </Link>
+    <>
       <Reveal>
         <header className="mb-12 mt-8 border-b border-line pb-8">
           <p className="font-mono text-xs uppercase tracking-wider text-accent">
@@ -51,6 +65,6 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
       <div className="prose-mdx">
         <Content />
       </div>
-    </article>
+    </>
   );
 }

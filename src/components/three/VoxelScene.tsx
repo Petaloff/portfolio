@@ -60,27 +60,42 @@ function Voxels({ name }: { name: string }) {
       pos[j + 2] += (target.positions[j + 2] - pos[j + 2]) * k;
       scl[i] += (target.scales[i] - scl[i]) * k;
 
-      // Gentle idle bob so the shape never looks frozen
-      const bob = Math.sin(t * 1.3 + i * 0.37) * 0.012;
-      dummy.position.set(pos[j], pos[j + 1] + bob, pos[j + 2]);
+      dummy.position.set(pos[j], pos[j + 1], pos[j + 2]);
       dummy.scale.setScalar(scl[i]);
       dummy.updateMatrix();
       m.setMatrixAt(i, dummy.matrix);
     }
     m.instanceMatrix.needsUpdate = true;
 
-    // Fit the name to the viewport and follow the pointer a little
-    const fit = Math.min(1, (viewport.width * 0.8) / nameWidth);
-    g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, fit, 4, dt));
-    // Outside the hero the shape moves aside to leave room for text
+    // Hero: the name spans the top of the screen. Elsewhere on wide screens
+    // the shape sits in the right-hand column, sized to fit it; on narrow
+    // screens it stays centred behind the (dimmed) content.
     const wide = viewport.aspect > 1.2;
-    const side = sceneState.formation !== "name" && wide ? viewport.width * 0.24 : 0;
-    const lift = sceneState.formation === "name" ? viewport.height * 0.26 : 0;
-    g.position.x = THREE.MathUtils.damp(g.position.x, side, 2.5, dt);
-    g.position.y = THREE.MathUtils.damp(g.position.y, lift, 2.5, dt);
+    let fit: number;
+    let x0 = 0;
+    let y0 = 0;
+    if (sceneState.formation === "name") {
+      fit = Math.min(1, (viewport.width * 0.8) / nameWidth);
+      y0 = viewport.height * 0.26;
+    } else if (wide) {
+      fit = Math.min(1.1, (viewport.width * 0.15) / target.radius, (viewport.height * 0.36) / target.radius);
+      x0 = viewport.width * 0.29;
+    } else {
+      fit = Math.min(1, (viewport.width * 0.42) / target.radius);
+    }
+    g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, fit, 3, dt));
+    g.position.x = THREE.MathUtils.damp(g.position.x, x0, 2.5, dt);
+    g.position.y = THREE.MathUtils.damp(g.position.y, y0, 2.5, dt);
     const { x, y } = sceneState.pointer;
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, x * 0.25 + Math.sin(t * 0.15) * 0.1, 3, dt);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, -y * 0.2, 3, dt);
+    // The name stays mostly flat to remain readable; other shapes turn slowly
+    const flat = sceneState.formation === "name";
+    const spin = flat ? Math.sin(t * 0.2) * 0.06 : t * 0.25;
+    const tilt = flat ? 0 : 0.45;
+    const targetY = spin + x * (flat ? 0.15 : 0.3);
+    // Ease along the shortest arc so switching shapes never whips around
+    const diff = THREE.MathUtils.euclideanModulo(targetY - g.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
+    g.rotation.y += diff * (1 - Math.exp(-dt * 3));
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, tilt - y * 0.15, 3, dt);
   });
 
   return (
@@ -105,7 +120,7 @@ export default function VoxelScene({ name }: { name: string }) {
 
   return (
     <Canvas
-      camera={{ position: [0, 0, 14], fov: 35 }}
+      camera={{ position: [0, 0, 30], fov: 16 }}
       dpr={[1, 1.75]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       aria-hidden

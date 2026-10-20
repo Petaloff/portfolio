@@ -38,12 +38,14 @@ export function DiscordStatus() {
     };
   }, []);
 
-  const status = presence?.status;
+  // Hidden until Lanyard answers, so a missing status never looks broken
+  if (!presence) return null;
+  const { status } = presence;
   return (
     <span className="inline-flex items-center gap-2 font-mono text-xs text-muted">
-      <span className={`h-2 w-2 ${status ? colors[status] : "bg-line"}`} />
-      {status ? t(status) : t("unknown")}
-      {presence?.activity && <span className="text-fg">· {presence.activity}</span>}
+      <span className={`h-2 w-2 ${colors[status]}`} />
+      Discord: {t(status)}
+      {presence.activity && <span className="text-fg">· {presence.activity}</span>}
     </span>
   );
 }
