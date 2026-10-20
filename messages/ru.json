@@ -11,7 +11,8 @@
     "contact": "Контакты",
     "skip": "Перейти к содержимому",
     "minecraft": "Minecraft",
-    "now": "Сейчас"
+    "now": "Сейчас",
+    "changelog": "Changelog"
   },
   "hero": {
     "kicker": "Fullstack-разработчик",
@@ -105,5 +106,10 @@
     "updated": "Обновлено",
     "listening": "Сейчас играет",
     "silence": "Сейчас ничего не играет в Spotify."
+  },
+  "changelog": {
+    "title": "Changelog",
+    "lead": "Все релизы модов с Modrinth и проектов с GitHub в одной ленте. Обновляется раз в час.",
+    "empty": "Релизов пока нет или источники сейчас недоступны."
   }
 }

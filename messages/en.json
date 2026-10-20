@@ -11,7 +11,8 @@
     "contact": "Contact",
     "skip": "Skip to content",
     "minecraft": "Minecraft",
-    "now": "Now"
+    "now": "Now",
+    "changelog": "Changelog"
   },
   "hero": {
     "kicker": "Fullstack developer",
@@ -105,5 +106,10 @@
     "updated": "Updated",
     "listening": "Now playing",
     "silence": "Nothing playing on Spotify right now."
+  },
+  "changelog": {
+    "title": "Changelog",
+    "lead": "Every mod release from Modrinth and project release from GitHub in one feed. Refreshed hourly.",
+    "empty": "No releases yet, or the sources are unavailable right now."
   }
 }
