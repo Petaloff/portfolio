@@ -28,7 +28,7 @@ export async function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <div className="hidden sm:block">
+          <div className="hidden md:block">
             <ModeToggle />
           </div>
           <LocaleSwitch />

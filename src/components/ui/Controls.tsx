@@ -45,7 +45,7 @@ export function LiteHint() {
   const mode = useRenderMode();
   if (mode !== "lite") return null;
   return (
-    <div className="mt-10 flex flex-wrap items-center gap-4 text-sm text-muted">
+    <div className="mt-10 hidden flex-wrap items-center gap-4 text-sm text-muted md:flex">
       <span>{t("hint")}</span>
       <ModeToggle />
     </div>

@@ -11,6 +11,13 @@ export async function Hero() {
 
       className="mx-auto flex min-h-dvh max-w-6xl flex-col justify-end px-4 pb-16 pt-32 md:px-8 md:pb-24"
     >
+      {/* Phones have no 3D scene, so the nickname is plain type there */}
+      <p
+        aria-hidden
+        className="mb-auto pt-6 font-mono text-[15vw] font-bold leading-none tracking-tighter md:hidden"
+      >
+        PETALOFF<span className="text-accent">_</span>
+      </p>
       <Reveal>
         <p className="font-mono text-xs uppercase tracking-[0.25em] text-accent">{t("kicker")}</p>
       </Reveal>
