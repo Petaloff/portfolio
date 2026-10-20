@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber"
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Day } from "@/lib/contributions";
+import "../three/quiet";
 
 const PITCH = 1.15;
 

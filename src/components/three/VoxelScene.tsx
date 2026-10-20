@@ -4,18 +4,13 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { sceneState } from "@/lib/scene";
+import "./quiet";
 import { buildName, COUNT, SIZE } from "./formations";
 
 const ACCENT_EVERY = 11;
 // Phones get a coarser grid: fewer, bigger cubes stay crisp at small sizes
 const NARROW_BUDGET = 360;
 
-// R3F 9 still creates a THREE.Clock internally, which three r183+ flags as
-// deprecated on every mount. The scene itself uses THREE.Timer, so mute just that notice.
-THREE.setConsoleFunction((type, message, ...params) => {
-  if (type === "warn" && message.startsWith("THREE.Clock:")) return;
-  console[type as "log" | "warn" | "error"](message, ...params);
-});
 
 function readColors() {
   const style = getComputedStyle(document.documentElement);
