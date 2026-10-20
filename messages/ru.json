@@ -10,7 +10,8 @@
     "blog": "Блог",
     "contact": "Контакты",
     "skip": "Перейти к содержимому",
-    "minecraft": "Minecraft"
+    "minecraft": "Minecraft",
+    "now": "Сейчас"
   },
   "hero": {
     "kicker": "Fullstack-разработчик",
@@ -97,5 +98,12 @@
     "online": "онлайн",
     "offline": "офлайн",
     "drag": "покрутите мышкой"
+  },
+  "now": {
+    "title": "Сейчас",
+    "lead": "Чем я занимаюсь в последнее время.",
+    "updated": "Обновлено",
+    "listening": "Сейчас играет",
+    "silence": "Сейчас ничего не играет в Spotify."
   }
 }

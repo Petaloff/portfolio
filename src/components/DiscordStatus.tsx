@@ -1,11 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import { site } from "@/lib/site";
-
-type Status = "online" | "idle" | "dnd" | "offline";
-type Presence = { status: Status; activity: string | null };
+import { usePresence, type DiscordStatus as Status } from "@/lib/lanyard";
 
 const colors: Record<Status, string> = {
   online: "bg-emerald-400",
@@ -17,26 +13,7 @@ const colors: Record<Status, string> = {
 // Live presence via Lanyard (requires joining discord.gg/lanyard once)
 export function DiscordStatus() {
   const t = useTranslations("discord");
-  const [presence, setPresence] = useState<Presence | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    const load = async () => {
-      try {
-        const res = await fetch(`https://api.lanyard.rest/v1/users/${site.discordId}`);
-        const json = await res.json();
-        if (!alive || !json.success) return;
-        const activity = json.data.activities?.find((a: { type: number }) => a.type !== 4);
-        setPresence({ status: json.data.discord_status, activity: activity?.name ?? null });
-      } catch {}
-    };
-    load();
-    const id = setInterval(load, 30_000);
-    return () => {
-      alive = false;
-      clearInterval(id);
-    };
-  }, []);
+  const presence = usePresence();
 
   // Hidden until Lanyard answers, so a missing status never looks broken
   if (!presence) return null;

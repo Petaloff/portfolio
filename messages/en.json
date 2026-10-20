@@ -10,7 +10,8 @@
     "blog": "Blog",
     "contact": "Contact",
     "skip": "Skip to content",
-    "minecraft": "Minecraft"
+    "minecraft": "Minecraft",
+    "now": "Now"
   },
   "hero": {
     "kicker": "Fullstack developer",
@@ -97,5 +98,12 @@
     "online": "online",
     "offline": "offline",
     "drag": "drag to rotate"
+  },
+  "now": {
+    "title": "Now",
+    "lead": "What I am up to these days.",
+    "updated": "Updated",
+    "listening": "Now playing",
+    "silence": "Nothing playing on Spotify right now."
   }
 }

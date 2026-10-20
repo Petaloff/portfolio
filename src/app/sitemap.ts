@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/blog",
     "/privacy",
+    "/now",
     ...getPostSlugs().map((s) => `/blog/${s}`),
     ...getProjects()
       .filter((p) => p.caseStudy)
