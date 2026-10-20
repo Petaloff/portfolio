@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 import { Reveal } from "@/components/Reveal";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -46,13 +46,18 @@ async function ProjectCase({ params }: { params: Params }) {
 
   return (
     <>
-      <Reveal>
-        <header className="mb-12 mt-8 border-b border-line pb-8">
-          <p className="font-mono text-xs uppercase tracking-wider text-accent">
+      {/* No Reveal here: the header is the landing spot for the card morph */}
+      <header className="mb-12 mt-8 border-b border-line pb-8">
+        <ViewTransition name={`project-meta-${project.slug}`} share="morph" default="none">
+          <p className="w-fit font-mono text-xs uppercase tracking-wider text-accent">
             {project.categories.map((c) => t(c)).join(" · ")} · {project.year}
           </p>
-          <h1 className="mt-4 text-5xl font-semibold tracking-tighter md:text-7xl">{project.title}</h1>
-          <p className="mt-6 text-lg text-muted">{project.summary[locale]}</p>
+        </ViewTransition>
+        <ViewTransition name={`project-title-${project.slug}`} share="morph" default="none">
+          <h1 className="mt-4 w-fit text-5xl font-semibold tracking-tighter md:text-7xl">{project.title}</h1>
+        </ViewTransition>
+        <p className="mt-6 text-lg text-muted">{project.summary[locale]}</p>
+        <Reveal>
           <ul className="mt-6 flex flex-wrap gap-2 font-mono text-xs">
             {project.tags.map((tag) => (
               <li key={tag} className="bg-surface px-2 py-1">
@@ -60,8 +65,8 @@ async function ProjectCase({ params }: { params: Params }) {
               </li>
             ))}
           </ul>
-        </header>
-      </Reveal>
+        </Reveal>
+      </header>
       <div className="prose-mdx">
         <Content />
       </div>

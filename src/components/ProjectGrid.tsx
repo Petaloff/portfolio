@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, ViewTransition } from "react";
 import { Link } from "@/i18n/navigation";
 import type { Project, ProjectCategory } from "../../content/projects";
 
@@ -58,9 +58,12 @@ export function ProjectGrid({ projects }: { projects: Item[] }) {
               className="group relative flex flex-col gap-4 bg-bg p-6 md:p-8"
             >
               <div className="flex items-baseline justify-between gap-4 font-mono text-xs text-muted">
-                <span>
-                  {p.categories.map((c) => t(c)).join(" · ")} · {p.year}
-                </span>
+                {/* Meta and title morph into the case study header */}
+                <ViewTransition name={`project-meta-${p.slug}`} share="morph" default="none">
+                  <span>
+                    {p.categories.map((c) => t(c)).join(" · ")} · {p.year}
+                  </span>
+                </ViewTransition>
                 <span className="flex gap-3">
                   {p.stars !== undefined && (
                     <span>
@@ -74,7 +77,9 @@ export function ProjectGrid({ projects }: { projects: Item[] }) {
                   )}
                 </span>
               </div>
-              <h3 className="text-2xl font-semibold tracking-tight">{p.title}</h3>
+              <ViewTransition name={`project-title-${p.slug}`} share="morph" default="none">
+                <h3 className="w-fit text-2xl font-semibold tracking-tight">{p.title}</h3>
+              </ViewTransition>
               <p className="text-muted">{p.summary[locale]}</p>
               <ul className="relative z-10 mt-auto flex flex-wrap gap-2 font-mono text-xs">
                 {p.tags.map((tg) => (
