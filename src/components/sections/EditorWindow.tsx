@@ -38,9 +38,11 @@ export function EditorWindow({
 }) {
   const file = files.find((f) => f.id === id)!;
   return (
-    <section id={id} className={`mx-auto max-w-6xl px-4 py-20 md:px-8 md:py-28 ${className}`}>
+    <section id={id} className={`group/section mx-auto max-w-6xl px-4 py-20 md:px-8 md:py-28 ${className}`}>
       <Reveal>
-        <div className="overflow-hidden border border-line bg-surface/60 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] duration-500 hover:border-line hover:shadow-[0_40px_90px_-40px_rgba(0,0,0,0.9),0_0_0_1px_color-mix(in_oklab,var(--accent)_18%,transparent)]">
+        {/* While the 3D head is thinking about this section (data-thought on the
+            section, set by the scene), the window lights up on the head's side */}
+        <div className="overflow-hidden border border-line bg-surface/60 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] duration-500 group-data-thought/section:border-accent/40 group-data-[thought=left]/section:shadow-[-24px_0_70px_-30px_color-mix(in_oklab,var(--accent)_45%,transparent)] group-data-[thought=right]/section:shadow-[24px_0_70px_-30px_color-mix(in_oklab,var(--accent)_45%,transparent)] hover:border-line hover:shadow-[0_40px_90px_-40px_rgba(0,0,0,0.9),0_0_0_1px_color-mix(in_oklab,var(--accent)_18%,transparent)]">
           {/* Title bar with window controls and file tabs */}
           <div className="flex h-10 items-stretch border-b border-line bg-bg/60 font-mono text-xs">
             <div className="flex items-center gap-1.5 px-4" aria-hidden>
@@ -104,6 +106,9 @@ export function EditorWindow({
                 <span className="text-accent">⎇</span> main
               </span>
               <span className="hidden sm:inline">✓ 0 problems</span>
+              <span className="hidden animate-pulse text-accent group-data-thought/section:inline" aria-hidden>
+                ···
+              </span>
             </span>
             <span className="flex gap-4">
               <span>{file.lang}</span>

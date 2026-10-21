@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useCalm } from "@/lib/media";
 import { sceneState } from "@/lib/scene";
@@ -57,6 +57,9 @@ export function Thought() {
   const progress = useRef(0);
 
   const side = useRef({ value: 1, holdUntil: 0 });
+  // The section window the cloud is about, marked so it can light up (see EditorWindow)
+  const marked = useRef<Element | null>(null);
+  useEffect(() => () => marked.current?.removeAttribute("data-thought"), []);
   const change = useRef({ section: "", at: -10 });
 
   useFrame(() => {
@@ -138,6 +141,13 @@ export function Thought() {
     }
     t.instanceMatrix.needsUpdate = true;
     c.visible = t.visible = p > 0;
+
+    const el = target && p > 0.6 ? document.getElementById(section) : null;
+    if (el !== marked.current) {
+      marked.current?.removeAttribute("data-thought");
+      el?.setAttribute("data-thought", facing > 0 ? "right" : "left");
+      marked.current = el;
+    }
 
     // Always on the move while it is up, unless motion is reduced
     if (p !== target || (live && p > 0) || now < side.current.holdUntil || headState.flying) invalidate();
