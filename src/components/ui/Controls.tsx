@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { modeStore, useRenderMode } from "@/lib/store";
 
-const button =
+export const controlButton =
   "inline-flex h-9 items-center justify-center border border-line px-3 font-mono text-xs uppercase tracking-wider transition-[color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-fg hover:text-fg active:translate-y-0";
 
 export function ModeToggle() {
@@ -13,7 +13,7 @@ export function ModeToggle() {
   return (
     <button
       type="button"
-      className={button}
+      className={controlButton}
       aria-pressed={mode === "full"}
       onClick={() => modeStore.set(mode === "full" ? "lite" : "full")}
     >
@@ -28,7 +28,7 @@ export function LocaleSwitch() {
   const pathname = usePathname();
   return (
     <Link
-      className={button}
+      className={controlButton}
       href={pathname}
       locale={locale === "ru" ? "en" : "ru"}
       lang={locale === "ru" ? "en" : "ru"}
