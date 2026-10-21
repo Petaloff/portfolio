@@ -1,0 +1,181 @@
+"use client";
+
+import { useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, useState } from "react";
+import * as THREE from "three";
+import { useCalm } from "@/lib/media";
+import { sceneState } from "@/lib/scene";
+import { fromModel, SIZE } from "./formations";
+import { fitSide, sidePose } from "./pose";
+import { headFromSkin, models, type Model } from "./voxelArt";
+
+const N = models.head.voxels.length;
+// Size of the head docked in the corner, in CSS pixels
+const DOCK = 84;
+const DOCK_ROOMY = 116;
+
+function readColors() {
+  const style = getComputedStyle(document.documentElement);
+  return {
+    fg: new THREE.Color(style.getPropertyValue("--fg").trim()),
+    accent: new THREE.Color(style.getPropertyValue("--accent").trim()),
+  };
+}
+
+// The Minecraft head of the "about me" section. It looks at the cursor, and
+// once the page scrolls past that section it docks in the bottom left corner
+// and keeps watching from there. Hidden in the hero, where the name is
+export function Head({ skin }: { skin?: string }) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const material = useRef<THREE.MeshStandardMaterial>(null);
+  const group = useRef<THREE.Group>(null);
+  const { viewport, size, invalidate } = useThree();
+  const calm = useCalm();
+  const timer = useMemo(() => new THREE.Timer(), []);
+  const [model, setModel] = useState<Model>(models.head);
+  const layout = useMemo(() => fromModel(model, N), [model]);
+  const colors = useMemo(() => readColors(), []);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  // Cubes start scattered and fly together the first time the head shows up
+  const current = useRef<Float32Array | null>(null);
+  const visible = useRef(false);
+
+  // Paint it with the skin once that has loaded; until then it is the plain head
+  useEffect(() => {
+    if (!skin) return;
+    let cancelled = false;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (cancelled || img.width < 64) return;
+      const canvas = document.createElement("canvas");
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0);
+      try {
+        setModel(headFromSkin(ctx.getImageData(0, 0, 64, 64).data));
+      } catch {
+        // a tainted canvas keeps the plain head
+      }
+    };
+    img.src = `https://mc-heads.net/skin/${skin}`;
+    return () => {
+      cancelled = true;
+    };
+  }, [skin]);
+
+  useEffect(() => {
+    const m = mesh.current;
+    if (!m) return;
+    const tint = new THREE.Color();
+    const rgb = layout.colors;
+    for (let i = 0; i < N; i++) {
+      if (rgb) tint.setRGB(rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2], THREE.SRGBColorSpace);
+      m.setColorAt(i, rgb ? tint : layout.accent[i] ? colors.accent : colors.fg);
+    }
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+    invalidate();
+  }, [layout, colors, invalidate]);
+
+  // The cursor only redraws the scene while the head is there to follow it
+  useEffect(() => {
+    const onMove = () => {
+      if (visible.current) invalidate();
+    };
+    addEventListener("pointermove", onMove, { passive: true });
+    return () => removeEventListener("pointermove", onMove);
+  }, [invalidate]);
+
+  useFrame(() => {
+    const m = mesh.current;
+    const g = group.current;
+    const mat = material.current;
+    if (!m || !g || !mat) return;
+    timer.update();
+    const dt = Math.min(timer.getDelta(), 1 / 30);
+
+    const hero = scrollY / innerHeight < 0.6;
+    const section = sceneState.section;
+    const about = !hero && section === "about";
+    const docked = !hero && !about && section !== "";
+    visible.current = about || docked;
+
+    const { px, margin, roomy, x: sideX, width: sideW } = sidePose(viewport, size);
+    let x = sideX;
+    let y = 0;
+    let scale = visible.current ? fitSide(layout, sideW, viewport.height, roomy) : 0;
+    let opacity = roomy ? 0.95 : 0.35;
+    if (docked) {
+      const dock = roomy ? Math.min(DOCK_ROOMY, margin * 0.5) : DOCK;
+      x = -viewport.width / 2 + (roomy ? margin / 2 : 24 + dock / 2) * px;
+      y = -viewport.height / 2 + (28 + dock / 2) * px;
+      scale = (dock * px) / Math.hypot(layout.width, layout.depth);
+      opacity = 1;
+    }
+    // Slipping away into the hero, it stays where it was and shrinks
+    if (!visible.current) {
+      x = g.position.x;
+      y = g.position.y;
+    }
+
+    const lambda = calm ? 60 : 5;
+    g.position.x = THREE.MathUtils.damp(g.position.x, x, lambda, dt);
+    g.position.y = THREE.MathUtils.damp(g.position.y, y, lambda, dt);
+    g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, scale, lambda, dt));
+    mat.opacity = THREE.MathUtils.damp(mat.opacity, opacity, lambda, dt);
+
+    // Turn to the cursor: its offset from the head on screen, in screen-height units
+    const p = sceneState.pointer;
+    const dx = (p.x - g.position.x / (viewport.width / 2)) * viewport.aspect;
+    const dy = p.y + g.position.y / (viewport.height / 2);
+    const yaw = calm ? (docked ? 0.4 : -0.4) : THREE.MathUtils.clamp(Math.atan(dx / 0.9), -0.9, 0.9);
+    const pitch = calm ? 0.15 : THREE.MathUtils.clamp(Math.atan(dy / 0.9), -0.55, 0.55);
+    const turn = calm ? 60 : 8;
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, yaw, turn, dt);
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pitch, turn, dt);
+
+    if (visible.current || g.scale.x > 1e-3) {
+      current.current ??= calm
+        ? layout.positions.slice(0, N * 3)
+        : Float32Array.from({ length: N * 3 }, (_, i) => Math.sin(i * 12.9898) * 6);
+    }
+    const pos = current.current;
+    let moving = 0;
+    if (pos) {
+      for (let i = 0; i < N; i++) {
+        const k = calm ? 1 : 1 - Math.exp(-dt * (2 + ((i * 37) % 100) / 40));
+        for (let a = 0; a < 3; a++) {
+          const j = i * 3 + a;
+          const d = layout.positions[j] - pos[j];
+          moving = Math.max(moving, Math.abs(d));
+          pos[j] += d * k;
+        }
+        dummy.position.set(pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2]);
+        dummy.updateMatrix();
+        m.setMatrixAt(i, dummy.matrix);
+      }
+      m.instanceMatrix.needsUpdate = true;
+    }
+
+    const settled =
+      moving < 2e-3 &&
+      Math.abs(g.position.x - x) < 1e-3 &&
+      Math.abs(g.position.y - y) < 1e-3 &&
+      Math.abs(g.scale.x - scale) < 1e-4 &&
+      Math.abs(g.rotation.y - yaw) < 1e-3 &&
+      Math.abs(g.rotation.x - pitch) < 1e-3 &&
+      Math.abs(mat.opacity - opacity) < 1e-3;
+    if (!settled) invalidate();
+  });
+
+  return (
+    <group ref={group} scale={0}>
+      <instancedMesh ref={mesh} args={[undefined, undefined, N]} frustumCulled={false}>
+        <boxGeometry args={[SIZE, SIZE, SIZE]} />
+        <meshStandardMaterial ref={material} roughness={0.55} metalness={0.05} transparent opacity={0} />
+      </instancedMesh>
+    </group>
+  );
+}

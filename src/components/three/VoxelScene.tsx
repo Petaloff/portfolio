@@ -9,14 +9,14 @@ import "./quiet";
 import { AdaptiveDpr } from "./AdaptiveDpr";
 import { buildName, COUNT, fromModel, SIZE, type Formation } from "./formations";
 import { MoodLights } from "./MoodLights";
-import { headFromSkin, models, type Model } from "./voxelArt";
+import { Head } from "./Head";
+import { fitSide as fit, sidePose, smoothstep } from "./pose";
+import { models } from "./voxelArt";
 
 // Narrow windows get a coarser grid: fewer, bigger cubes stay crisp at small
 // sizes. Tablets get a lighter one so slower GPUs keep up
 const NARROW_BUDGET = 360;
 const TABLET_BUDGET = 520;
-// The page content column (max-w-6xl); the side figure sits in the margin beside it
-const CONTENT_WIDTH = 1152;
 
 // While a home page section is in the middle of the screen, the cubes take its shape
 const sections: Record<string, Shape> = {
@@ -35,7 +35,8 @@ function buildShape(shape: Shape, name: string, budget: number): Formation {
     case "name":
       return buildName(name, budget);
     case "head":
-      return fromModel(models.head, budget);
+      // The cubes fold into the head's outline and shrink away: the Head takes over there
+      return { ...fromModel(models.head, budget), scales: new Float32Array(COUNT) };
     case "code":
       return fromModel(models.code, budget);
     case "city":
@@ -59,12 +60,7 @@ function readColors() {
   };
 }
 
-const smoothstep = (a: number, b: number, x: number) => {
-  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
-};
-
-function Voxels({ name, skin, onReady }: { name: string; skin?: string; onReady?: () => void }) {
+function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
   const group = useRef<THREE.Group>(null);
@@ -78,46 +74,18 @@ function Voxels({ name, skin, onReady }: { name: string; skin?: string; onReady?
 
   // Shapes are rasterised the first time they are needed
   const shapes = useRef({ key: "", cache: new Map<Shape, Formation>() });
-  // The "about" head, painted with the Minecraft skin once it has loaded
-  const skinHead = useRef<Model | null>(null);
   const getShape = (shape: Shape) => {
     const key = `${name}|${budget}`;
     if (shapes.current.key !== key) shapes.current = { key, cache: new Map() };
     const { cache } = shapes.current;
     let f = cache.get(shape);
     if (!f) {
-      f = shape === "head" && skinHead.current ? fromModel(skinHead.current, budget) : buildShape(shape, name, budget);
+      f = buildShape(shape, name, budget);
       cache.set(shape, f);
     }
     return f;
   };
 
-  useEffect(() => {
-    if (!skin) return;
-    let cancelled = false;
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      if (cancelled || img.width < 64) return;
-      const canvas = document.createElement("canvas");
-      canvas.width = 64;
-      canvas.height = 64;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.drawImage(img, 0, 0);
-      try {
-        skinHead.current = headFromSkin(ctx.getImageData(0, 0, 64, 64).data);
-      } catch {
-        return; // a tainted canvas keeps the plain head
-      }
-      shapes.current.cache.delete("head");
-      invalidate();
-    };
-    img.src = `https://mc-heads.net/skin/${skin}`;
-    return () => {
-      cancelled = true;
-    };
-  }, [skin, invalidate]);
   const colors = useMemo(() => readColors(), []);
   const tint = useMemo(() => new THREE.Color(), []);
   const shown = useRef<{ shape: Shape | null; formation: Formation | null }>({ shape: null, formation: null });
@@ -208,19 +176,10 @@ function Voxels({ name, skin, onReady }: { name: string; skin?: string; onReady?
 
     // 0 is the hero banner, 1 the side figure
     const side = smoothstep(0.35, 1, scrolled);
-    const px = viewport.width / size.width;
-    const margin = (size.width - Math.min(size.width, CONTENT_WIDTH)) / 2;
-    // Wide screens have room beside the content; elsewhere the figure stays
-    // behind the windows, dimmed so the text keeps reading well
-    const roomy = margin >= 240;
-    const sideX = (roomy ? size.width / 2 - margin / 2 : size.width * 0.36) * px;
-    const sideW = (roomy ? margin * 0.7 : size.width * 0.18) * px;
+    const { roomy, x: sideX, width: sideW } = sidePose(viewport, size);
     const fitHero = Math.min(1, (viewport.width * 0.8) / layout.width);
     // The side figure turns, so solid shapes need room for their diagonal
-    const fitSide = Math.min(
-      sideW / Math.hypot(layout.width, layout.depth),
-      (viewport.height * (roomy ? 0.4 : 0.3)) / layout.height,
-    );
+    const fitSide = fit(layout, sideW, viewport.height, roomy);
     const lambda = calm ? 60 : 6;
     const scale = THREE.MathUtils.damp(g.scale.x, THREE.MathUtils.lerp(fitHero, fitSide, side), lambda, dt);
     g.scale.setScalar(scale);
@@ -380,7 +339,8 @@ export default function VoxelScene({
     >
       <AdaptiveDpr />
       <MoodLights />
-      <Voxels name={name} skin={skin} onReady={onReady} />
+      <Voxels name={name} onReady={onReady} />
+      <Head skin={skin} />
     </Canvas>
   );
 }
