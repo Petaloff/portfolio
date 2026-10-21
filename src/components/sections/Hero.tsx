@@ -5,11 +5,12 @@ import { Words } from "@/components/motion/Words";
 import { Reveal } from "@/components/Reveal";
 import { LiteHint } from "@/components/ui/Controls";
 import { Link } from "@/i18n/navigation";
+import { HeroFrame } from "@/components/sections/HeroFrame";
 
 export async function Hero() {
   const t = await getTranslations("hero");
   return (
-    <section className="mx-auto flex min-h-dvh max-w-6xl flex-col justify-end px-4 pt-32 pb-16 md:px-8 md:pb-24">
+    <HeroFrame>
       {/* Phones have no 3D scene, so the nickname is plain type there */}
       <p aria-hidden className="mb-auto pt-6 font-mono text-[15vw] leading-none font-bold tracking-tighter md:hidden">
         PETALOFF<span className="text-accent">_</span>
@@ -36,6 +37,6 @@ export async function Hero() {
         <DiscordStatus />
       </Reveal>
       <LiteHint />
-    </section>
+    </HeroFrame>
   );
 }
