@@ -5,3 +5,8 @@ export function paragraphs(story: string): string[] {
     .map((p) => p.trim())
     .filter(Boolean);
 }
+
+// Splits a paragraph on **bold** markers: odd parts are the emphasised ones
+export function emphasis(text: string): string[] {
+  return text.split(/\*\*(.+?)\*\*/);
+}
