@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { CountUp } from "@/components/motion/CountUp";
 import { getLiveStats } from "@/lib/live";
+import { emphasis, paragraphs } from "@/lib/paragraphs";
 import { EditorWindow } from "./EditorWindow";
 
 export async function About() {
@@ -17,7 +18,22 @@ export async function About() {
   return (
     <EditorWindow id="about" title={t("about.title")}>
       <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-start">
-        <p className="text-2xl leading-snug tracking-tight text-pretty md:text-[1.75rem]">{t("about.body")}</p>
+        {/* Blank lines split the text into paragraphs, **text** marks the key words */}
+        <div className="max-w-prose space-y-5 text-base leading-relaxed text-pretty text-fg/75 md:text-lg">
+          {paragraphs(t("about.body")).map((p, i) => (
+            <p key={i} className={i === 0 ? "text-xl leading-snug tracking-tight text-fg md:text-2xl" : undefined}>
+              {emphasis(p).map((part, j) =>
+                j % 2 ? (
+                  <strong key={j} className="font-medium text-fg">
+                    {part}
+                  </strong>
+                ) : (
+                  part
+                ),
+              )}
+            </p>
+          ))}
+        </div>
         {items.length > 0 && (
           // Live numbers presented as the JSON they come from
           <div className="border border-line bg-bg/70 p-5 font-mono text-sm leading-7">
