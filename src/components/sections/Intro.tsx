@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
-import { holdScroll } from "@/components/SmoothScroll";
+import { glideTo, holdScroll } from "@/components/SmoothScroll";
 import { onIntro, setIntro } from "@/lib/intro";
 import { usePhone } from "@/lib/media";
 import { sceneState } from "@/lib/scene";
@@ -16,6 +16,8 @@ const SWIPE = 50;
 // The page stays held while the sections come in, so the rest of a fling
 // does not carry the visitor past the hero
 const SETTLE = 900;
+// From the hero, the first scroll down glides on to the sections
+const GLIDE = 1200;
 
 // Runs the intro of the 3D home page (see lib/intro): it holds the page still
 // until the visitor scrolls a little, and brings the intro back when they
@@ -58,6 +60,19 @@ export function Intro({ hint }: { hint: string }) {
     };
     const atTop = () => scrollY < 2 && performance.now() - topSince > 400;
     const settling = () => performance.now() < settleUntil;
+    // The hero, once the intro has gone: a scroll down there glides on to the
+    // first section rather than stopping halfway
+    const firstSection = () => document.getElementById("about");
+    const inHero = () => {
+      const el = firstSection();
+      return !!el && scrollY < Math.min(innerHeight * 0.5, el.getBoundingClientRect().top + scrollY - 72 - 40);
+    };
+    const glide = () => {
+      const el = firstSection();
+      if (!el) return;
+      settleUntil = performance.now() + GLIDE + 300;
+      glideTo(el, GLIDE / 1000);
+    };
 
     const start = !location.hash && scrollY < 2;
     setIntro(start);
@@ -77,6 +92,9 @@ export function Intro({ hint }: { hint: string }) {
       } else if (atTop() && dy < 0) {
         wheel.sum -= dy;
         if (wheel.sum > WHEEL) show(true);
+      } else if (dy > 4 && inHero()) {
+        e.preventDefault();
+        glide();
       }
     };
     const onTouchStart = (e: TouchEvent) => {
@@ -97,6 +115,9 @@ export function Intro({ hint }: { hint: string }) {
         show(false);
       } else if (!sceneState.intro && atTop() && ["ArrowUp", "PageUp", "Home"].includes(e.key)) {
         show(true);
+      } else if (!sceneState.intro && inHero() && ["ArrowDown", "PageDown", " "].includes(e.key)) {
+        e.preventDefault();
+        glide();
       }
     };
     // Anything else that moves the page (an anchor, the scrollbar, a restored

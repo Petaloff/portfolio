@@ -11,6 +11,7 @@ import { Intro } from "@/components/sections/Intro";
 
 export async function Hero() {
   const t = await getTranslations("hero");
+  const nav = await getTranslations("nav");
   return (
     <>
       <HeroFrame>
@@ -36,6 +37,16 @@ export async function Hero() {
             >
               {t("cta")}
               <span className="inline-block transition-transform duration-300 group-hover:translate-y-0.5">↓</span>
+            </Link>
+          </Magnetic>
+          {/* The same page as "now" in the header */}
+          <Magnetic>
+            <Link
+              href="/now"
+              className="group inline-flex items-center gap-2 border border-line px-6 py-3 text-sm font-medium text-fg transition-[border-color,color] duration-300 hover:border-accent hover:text-accent"
+            >
+              {nav("now")}
+              <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5">→</span>
             </Link>
           </Magnetic>
           <DiscordStatus />

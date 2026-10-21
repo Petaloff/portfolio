@@ -17,6 +17,13 @@ export function holdScroll(hold: boolean) {
   else lenis?.start();
 }
 
+// Glides the page to an element, the way an anchor link does; the visitor's
+// own scrolling cannot cut in until it lands
+export function glideTo(el: HTMLElement, duration: number) {
+  if (lenis) lenis.scrollTo(el, { offset: -72, duration, lock: true, force: true });
+  else scrollTo({ top: el.getBoundingClientRect().top + scrollY - 72 });
+}
+
 export function SmoothScroll() {
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
