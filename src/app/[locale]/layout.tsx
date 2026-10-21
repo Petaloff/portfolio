@@ -11,6 +11,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { AmbientVoxels } from "@/components/three/AmbientVoxels";
 import { Background } from "@/components/three/Background";
 import { routing, type Locale } from "@/i18n/routing";
 import { pageMetadata } from "@/lib/seo";
@@ -70,6 +71,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
       <body className="min-h-dvh font-sans">
         <NextIntlClientProvider>
           <SmoothScroll />
+          <AmbientVoxels />
           {/* Reads the pathname, so it streams in on pages that render at request time */}
           <Suspense>
             <Background name={site.name.toUpperCase()} />
