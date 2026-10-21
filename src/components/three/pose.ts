@@ -77,7 +77,8 @@ export function headSide(section: string) {
 // Shared between the head, its cloud and the figure in it: the cloud only pops
 // up once the head has landed, and the figure only forms once the cloud is up
 // (cloud runs from 0, gone, to 1, fully shown)
-export const headState = { flying: false, cloud: 0 };
+// side is the margin the cloud is drawn in, which lags the head while it bursts
+export const headState = { flying: false, cloud: 0, side: 1 };
 
 // The cloud floats gently up and down, and the figure in it with it
 export const cloudBob = (t: number, height: number) => Math.sin(t * 1.3) * height * 0.06;
