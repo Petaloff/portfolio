@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extrude, models, upsample } from "./voxelArt";
+import { extrude, headFromSkin, models, upsample } from "./voxelArt";
 import { COUNT, fromModel } from "./formations";
 
 describe("extrude", () => {
@@ -34,5 +34,21 @@ describe("fromModel", () => {
   it("respects a smaller budget", () => {
     const f = fromModel(models.skyline, 360);
     expect(f.scales.filter((s) => s > 0).length).toBeLessThanOrEqual(360);
+  });
+});
+
+describe("headFromSkin", () => {
+  it("paints the front face from the skin's face texture and lets the hat cover it", () => {
+    const pixels = new Uint8ClampedArray(64 * 64 * 4);
+    const put = (u: number, v: number, rgba: number[]) => pixels.set(rgba, (v * 64 + u) * 4);
+    put(8, 8, [255, 0, 0, 255]); // front, top-left as seen from the front
+    put(15, 15, [0, 0, 255, 255]); // front, bottom-right
+    put(47, 15, [0, 255, 0, 255]); // hat over the bottom-right
+    const head = headFromSkin(pixels);
+    const colorAt = (x: number, y: number, z: number) =>
+      head.colors![head.voxels.findIndex((v) => v[0] === x && v[1] === y && v[2] === z)];
+    expect(head.voxels).toHaveLength(8 ** 3 - 6 ** 3);
+    expect(colorAt(0, 7, 7)).toEqual([1, 0, 0]);
+    expect(colorAt(7, 0, 7)).toEqual([0, 1, 0]);
   });
 });

@@ -18,6 +18,8 @@ export type Formation = {
   width: number;
   height: number;
   depth: number;
+  // Per-cube sRGB colours (0–1, three per cube), overriding fg/accent
+  colors?: Float32Array;
 };
 
 // Rasterise text on a 2D canvas and turn filled pixels into voxels centred on
@@ -74,12 +76,13 @@ export function buildName(text: string, budget = COUNT): Formation {
 export function fromModel(model: Model, budget = COUNT): Formation {
   let k = 1;
   while (model.voxels.length * (k + 1) ** 3 <= budget) k++;
-  let { voxels, accent } = upsample(model, k);
+  let { voxels, accent, colors } = upsample(model, k);
   if (voxels.length > budget) {
     const stride = voxels.length / budget;
     const keep = Array.from({ length: budget }, (_, i) => Math.floor(i * stride));
     voxels = keep.map((i) => voxels[i]);
     accent = keep.map((i) => accent[i]);
+    colors = colors && keep.map((i) => colors![i]);
   }
   const min = [0, 1, 2].map((a) => Math.min(...voxels.map((v) => v[a])));
   const max = [0, 1, 2].map((a) => Math.max(...voxels.map((v) => v[a])));
@@ -88,7 +91,9 @@ export function fromModel(model: Model, budget = COUNT): Formation {
   const positions = new Float32Array(COUNT * 3);
   const scales = new Float32Array(COUNT);
   const flags = new Uint8Array(COUNT);
+  const rgb = colors && new Float32Array(COUNT * 3);
   voxels.forEach((v, i) => {
+    if (rgb && colors) rgb.set(colors[i], i * 3);
     positions.set(
       v.map((c, a) => (c - centre[a]) * UNIT),
       i * 3,
@@ -103,5 +108,6 @@ export function fromModel(model: Model, budget = COUNT): Formation {
     width: (max[0] - min[0]) * UNIT + SIZE,
     height: (max[1] - min[1]) * UNIT + SIZE,
     depth: (max[2] - min[2]) * UNIT + SIZE,
+    colors: rgb,
   };
 }

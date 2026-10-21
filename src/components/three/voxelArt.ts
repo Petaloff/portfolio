@@ -3,7 +3,9 @@
 // y pointing up, the same convention IsoCubes draws in.
 
 export type Voxel = [number, number, number];
-export type Model = { voxels: Voxel[]; accent: boolean[] };
+export type Rgb = [number, number, number];
+// colors, when present, give every voxel its own sRGB colour (0–1) instead of fg/accent
+export type Model = { voxels: Voxel[]; accent: boolean[]; colors?: Rgb[] };
 
 export function extrude(rows: string[], depth = 1): Model {
   const voxels: Voxel[] = [];
@@ -21,14 +23,15 @@ export function extrude(rows: string[], depth = 1): Model {
 }
 
 // Every voxel becomes a k×k×k block, so a tiny drawing can fill a big cube budget
-export function upsample({ voxels, accent }: Model, k: number): Model {
-  const out: Model = { voxels: [], accent: [] };
+export function upsample({ voxels, accent, colors }: Model, k: number): Model {
+  const out: Model = { voxels: [], accent: [], colors: colors && [] };
   voxels.forEach(([x, y, z], i) => {
     for (let a = 0; a < k; a++)
       for (let b = 0; b < k; b++)
         for (let c = 0; c < k; c++) {
           out.voxels.push([x * k + a, y * k + b, z * k + c]);
           out.accent.push(accent[i]);
+          if (colors) out.colors!.push(colors[i]);
         }
   });
   return out;
@@ -78,6 +81,40 @@ function head(): Model {
         if (ch === ".") continue;
         out.voxels.push([x, y, z]);
         out.accent.push(ch === "+");
+      }
+  return out;
+}
+
+// The head from a 64×64 Minecraft skin as the same 8×8×8 shell. Each surface
+// voxel takes the pixel of the face it sits on (front wins at edges, then top,
+// sides, back, bottom), with the hat layer drawn over it where it is opaque.
+// x runs left to right seen from the front, y up and z from back to front
+export function headFromSkin(pixels: ArrayLike<number>, width = 64): Model {
+  const read = (u: number, v: number): [number, number, number, number] => {
+    const i = (v * width + u) * 4;
+    return [pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]];
+  };
+  // Texture coordinates of the base layer for a voxel; the hat sits 32px to the right
+  const uv = (x: number, y: number, z: number): [number, number] => {
+    if (z === 7) return [8 + x, 8 + (7 - y)];
+    if (y === 7) return [8 + x, z];
+    if (x === 0) return [z, 8 + (7 - y)];
+    if (x === 7) return [16 + (7 - z), 8 + (7 - y)];
+    if (z === 0) return [24 + (7 - x), 8 + (7 - y)];
+    return [16 + x, 7 - z];
+  };
+  const out: Model = { voxels: [], accent: [], colors: [] };
+  for (let x = 0; x < 8; x++)
+    for (let y = 0; y < 8; y++)
+      for (let z = 0; z < 8; z++) {
+        if (x > 0 && x < 7 && y > 0 && y < 7 && z > 0 && z < 7) continue;
+        const [u, v] = uv(x, y, z);
+        const base = read(u, v);
+        const hat = read(u + 32, v);
+        const [r, g, b] = hat[3] > 128 ? hat : base;
+        out.voxels.push([x, y, z]);
+        out.accent.push(false);
+        out.colors!.push([r / 255, g / 255, b / 255]);
       }
   return out;
 }

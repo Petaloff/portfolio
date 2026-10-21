@@ -9,7 +9,7 @@ import "./quiet";
 import { AdaptiveDpr } from "./AdaptiveDpr";
 import { buildName, COUNT, fromModel, SIZE, type Formation } from "./formations";
 import { MoodLights } from "./MoodLights";
-import { models } from "./voxelArt";
+import { headFromSkin, models, type Model } from "./voxelArt";
 
 // Narrow windows get a coarser grid: fewer, bigger cubes stay crisp at small
 // sizes. Tablets get a lighter one so slower GPUs keep up
@@ -64,7 +64,7 @@ const smoothstep = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
+function Voxels({ name, skin, onReady }: { name: string; skin?: string; onReady?: () => void }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
   const group = useRef<THREE.Group>(null);
@@ -78,15 +78,48 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
 
   // Shapes are rasterised the first time they are needed
   const shapes = useRef({ key: "", cache: new Map<Shape, Formation>() });
+  // The "about" head, painted with the Minecraft skin once it has loaded
+  const skinHead = useRef<Model | null>(null);
   const getShape = (shape: Shape) => {
     const key = `${name}|${budget}`;
     if (shapes.current.key !== key) shapes.current = { key, cache: new Map() };
     const { cache } = shapes.current;
     let f = cache.get(shape);
-    if (!f) cache.set(shape, (f = buildShape(shape, name, budget)));
+    if (!f) {
+      f = shape === "head" && skinHead.current ? fromModel(skinHead.current, budget) : buildShape(shape, name, budget);
+      cache.set(shape, f);
+    }
     return f;
   };
+
+  useEffect(() => {
+    if (!skin) return;
+    let cancelled = false;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (cancelled || img.width < 64) return;
+      const canvas = document.createElement("canvas");
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0);
+      try {
+        skinHead.current = headFromSkin(ctx.getImageData(0, 0, 64, 64).data);
+      } catch {
+        return; // a tainted canvas keeps the plain head
+      }
+      shapes.current.cache.delete("head");
+      invalidate();
+    };
+    img.src = `https://mc-heads.net/skin/${skin}`;
+    return () => {
+      cancelled = true;
+    };
+  }, [skin, invalidate]);
   const colors = useMemo(() => readColors(), []);
+  const tint = useMemo(() => new THREE.Color(), []);
   const shown = useRef<{ shape: Shape | null; formation: Formation | null }>({ shape: null, formation: null });
   const ready = useRef(false);
 
@@ -146,7 +179,11 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     const shape: Shape = scrolled < 0.6 ? "name" : (sections[sceneState.section] ?? "name");
     const layout = getShape(shape);
     if (shown.current.formation !== layout) {
-      for (let i = 0; i < COUNT; i++) m.setColorAt(i, layout.accent[i] ? colors.accent : colors.fg);
+      const rgb = layout.colors;
+      for (let i = 0; i < COUNT; i++) {
+        if (rgb) tint.setRGB(rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2], THREE.SRGBColorSpace);
+        m.setColorAt(i, rgb ? tint : layout.accent[i] ? colors.accent : colors.fg);
+      }
       if (m.instanceColor) m.instanceColor.needsUpdate = true;
       shown.current = { shape, formation: layout };
     }
@@ -284,10 +321,12 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
 
 export default function VoxelScene({
   name,
+  skin,
   onReady,
   onFail,
 }: {
   name: string;
+  skin?: string;
   onReady?: () => void;
   onFail?: () => void;
 }) {
@@ -341,7 +380,7 @@ export default function VoxelScene({
     >
       <AdaptiveDpr />
       <MoodLights />
-      <Voxels name={name} onReady={onReady} />
+      <Voxels name={name} skin={skin} onReady={onReady} />
     </Canvas>
   );
 }

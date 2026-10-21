@@ -36,14 +36,14 @@ function Placeholder() {
   );
 }
 
-function FullScene({ name, onFail }: { name: string; onFail: () => void }) {
+function FullScene({ name, skin, onFail }: { name: string; skin?: string; onFail: () => void }) {
   const [ready, setReady] = useState(false);
   const [gone, setGone] = useState(false);
   return (
     <>
       <div className={`absolute inset-0 transition-opacity duration-700 ${ready ? "" : "opacity-0"}`}>
         <SceneBoundary onFail={onFail}>
-          <VoxelScene name={name} onReady={() => setReady(true)} onFail={onFail} />
+          <VoxelScene name={name} skin={skin} onReady={() => setReady(true)} onFail={onFail} />
         </SceneBoundary>
       </div>
       {!gone && (
@@ -61,7 +61,8 @@ function FullScene({ name, onFail }: { name: string; onFail: () => void }) {
 // The voxel name lives on the home page only, in 3D. It stays for the whole
 // page and changes shape with the sections. The light version's cluster is
 // part of the hero itself (LiteVoxels), so it scrolls away with it
-export function Background({ name }: { name: string }) {
+// skin is the Minecraft username whose head the "about" figure wears
+export function Background({ name, skin }: { name: string; skin?: string }) {
   const t = useTranslations("mode");
   const mode = useRenderMode();
   const pathname = usePathname();
@@ -93,7 +94,7 @@ export function Background({ name }: { name: string }) {
   return (
     <>
       <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden>
-        <FullScene name={name} onFail={fail} />
+        <FullScene name={name} skin={skin} onFail={fail} />
       </div>
       {notice}
     </>
