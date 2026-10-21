@@ -1,10 +1,12 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 import { Link } from "@/i18n/navigation";
 import { Logo } from "./Logo";
-import { LocaleSwitch, ModeToggle } from "./ui/Controls";
+import { controlButton, LocaleSwitch, ModeToggle } from "./ui/Controls";
 
 export async function Header() {
   const t = await getTranslations("nav");
+  const other = (await getLocale()) === "ru" ? "en" : "ru";
   const links = [
     { href: "/#about", label: t("about") },
     { href: "/#projects", label: t("projects") },
@@ -43,7 +45,16 @@ export async function Header() {
           <div className="hidden md:block">
             <ModeToggle />
           </div>
-          <LocaleSwitch />
+          {/* The switch needs the pathname; until it streams in, it points at the other home page */}
+          <Suspense
+            fallback={
+              <a className={controlButton} href={`/${other}`} lang={other}>
+                {other.toUpperCase()}
+              </a>
+            }
+          >
+            <LocaleSwitch />
+          </Suspense>
         </div>
       </div>
     </header>

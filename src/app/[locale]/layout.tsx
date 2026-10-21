@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { locale as rootLocale } from "next/root-params";
 import { Analytics } from "@/components/Analytics";
 import { EasterEgg } from "@/components/EasterEgg";
@@ -69,7 +70,10 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
       <body className="min-h-dvh font-sans">
         <NextIntlClientProvider>
           <SmoothScroll />
-          <Background name={site.name.toUpperCase()} />
+          {/* Reads the pathname, so it streams in on pages that render at request time */}
+          <Suspense>
+            <Background name={site.name.toUpperCase()} />
+          </Suspense>
           <Header />
           <ScrollProgress />
           <main id="main">{children}</main>

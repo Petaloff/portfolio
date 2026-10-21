@@ -91,6 +91,10 @@
     "title": "Privacy",
     "description": "What this site collects, honestly: anonymous stats, PostHog only if you say yes, Discord status and comments."
   },
+  "terms": {
+    "title": "Terms of use",
+    "description": "A couple of simple rules for the site and the guestbook: what you can post, what I keep and what I can remove."
+  },
   "footer": {
     "made": "Hand-built with Next.js and Three.js"
   },

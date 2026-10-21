@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
+import { connection } from "next/server";
 import Discord from "next-auth/providers/discord";
 import GitHub from "next-auth/providers/github";
+import { isOwner } from "@/lib/admin/owner";
 import { site } from "@/lib/site";
 
 // Only providers with credentials set are offered on the guestbook
@@ -17,13 +19,20 @@ export const authEnabled = authSecret && providers.length > 0;
 
 declare module "next-auth" {
   interface Session {
-    user: { id: string; name: string; image?: string | null; provider: "github" | "discord"; admin: boolean };
+    user: {
+      id: string;
+      name: string;
+      image?: string | null;
+      provider: "github" | "discord";
+      admin: boolean;
+      owner: boolean;
+    };
   }
 }
 
 // Stateless JWT sessions: no database for accounts, the guestbook only needs
 // a name, an avatar and where the visitor signed in from
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const nextAuth = NextAuth({
   providers,
   trustHost: true,
   session: { strategy: "jwt" },
@@ -47,10 +56,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           image: token.picture,
           provider,
           admin:
+            isOwner(provider, uid) ||
             (provider === "discord" && uid === site.discordId) ||
             (provider === "github" && String(token.login).toLowerCase() === site.github.toLowerCase()),
+          // Only the owner's GitHub account opens the admin panel
+          owner: isOwner(provider, uid),
         },
       };
     },
   },
 });
+
+export const { handlers, auth, signIn, signOut } = nextAuth;
+
+// Session for rendering. Auth.js makes a random CSRF token while reading it,
+// which Cache Components refuses during prerender, so this marks the read as request-time first
+export async function getSession() {
+  await connection();
+  return auth();
+}

@@ -24,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...localized("", { changeFrequency: "weekly", priority: 1 }),
     ...localized("/blog", { changeFrequency: "weekly", priority: 0.8, lastModified: latest }),
-    ...getProjects()
+    ...(await getProjects())
       .filter((p) => p.caseStudy)
       .flatMap((p) => localized(`/projects/${p.slug}`, { changeFrequency: "monthly", priority: 0.7 })),
     // Posts are written in one language, so only that URL is listed
@@ -37,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...localized("/now", { changeFrequency: "monthly", priority: 0.5 }),
     ...localized("/changelog", { changeFrequency: "daily", priority: 0.5 }),
     ...localized("/guestbook", { changeFrequency: "weekly", priority: 0.3 }),
+    ...localized("/terms", { changeFrequency: "yearly", priority: 0.1 }),
     ...localized("/privacy", { changeFrequency: "yearly", priority: 0.1 }),
   ];
 }
