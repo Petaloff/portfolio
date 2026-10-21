@@ -23,14 +23,18 @@ export async function Header() {
         <Link
           href="/"
           aria-label="Petaloff"
-          className="flex items-center gap-2.5 font-mono text-sm font-semibold tracking-tight"
+          className="group flex items-center gap-2.5 font-mono text-sm font-semibold tracking-tight"
         >
-          <Logo className="h-5 w-4" />
+          <Logo className="h-5 w-4 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12" />
           petaloff
         </Link>
         <nav className="hidden items-center gap-6 text-sm text-muted md:flex">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="transition-colors hover:text-fg">
+            <Link
+              key={l.href}
+              href={l.href}
+              className="relative transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 hover:text-fg hover:after:origin-left hover:after:scale-x-100"
+            >
               {l.label}
             </Link>
           ))}

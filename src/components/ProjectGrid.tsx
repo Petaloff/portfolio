@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, ViewTransition } from "react";
+import { Tilt } from "@/components/motion/Tilt";
 import { Link } from "@/i18n/navigation";
 import type { Project, ProjectCategory } from "../../content/projects";
 
@@ -47,71 +48,78 @@ export function ProjectGrid({ projects }: { projects: Item[] }) {
       {visible.length === 0 && <p className="font-mono text-sm text-muted">{t("empty")}</p>}
       <motion.ul layout className="grid gap-px border border-line bg-line md:grid-cols-2">
         <AnimatePresence mode="popLayout">
-          {visible.map((p) => (
+          {visible.map((p, i) => (
             <motion.li
               key={p.slug}
               layout
-              initial={{ opacity: 0, scale: 0.97 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
-              transition={{ duration: 0.35 }}
-              className="group relative flex flex-col gap-4 bg-bg p-6 md:p-8"
+              transition={{ duration: 0.5, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+              className="group bg-bg transition-colors duration-300 hover:z-10 hover:bg-surface"
             >
-              <div className="flex items-baseline justify-between gap-4 font-mono text-xs text-muted">
-                {/* Meta and title morph into the case study header */}
-                <ViewTransition name={`project-meta-${p.slug}`} share="morph" default="none">
-                  <span>
-                    {p.categories.map((c) => t(c)).join(" · ")} · {p.year}
+              <Tilt className="flex h-full flex-col gap-4 p-6 transition-shadow duration-300 group-hover:shadow-[0_24px_60px_-30px_color-mix(in_oklab,var(--accent)_45%,transparent)] md:p-8">
+                <div className="flex items-baseline justify-between gap-4 font-mono text-xs text-muted">
+                  {/* Meta and title morph into the case study header */}
+                  <ViewTransition name={`project-meta-${p.slug}`} share="morph" default="none">
+                    <span>
+                      {p.categories.map((c) => t(c)).join(" · ")} · {p.year}
+                    </span>
+                  </ViewTransition>
+                  <span className="flex gap-3">
+                    {p.stars !== undefined && (
+                      <span>
+                        ★ {p.stars} {t("stars")}
+                      </span>
+                    )}
+                    {p.downloads !== undefined && (
+                      <span>
+                        ↓ {p.downloads.toLocaleString(locale)} {t("downloads")}
+                      </span>
+                    )}
                   </span>
+                </div>
+                <ViewTransition name={`project-title-${p.slug}`} share="morph" default="none">
+                  <h3 className="w-fit text-2xl font-semibold tracking-tight transition-transform duration-300 group-hover:translate-x-1">
+                    {p.title}
+                  </h3>
                 </ViewTransition>
-                <span className="flex gap-3">
-                  {p.stars !== undefined && (
-                    <span>
-                      ★ {p.stars} {t("stars")}
-                    </span>
+                <p className="text-muted">{p.summary[locale]}</p>
+                <ul className="relative z-10 mt-auto flex flex-wrap gap-2 font-mono text-xs">
+                  {p.tags.map((tg) => (
+                    <li key={tg}>
+                      <button
+                        type="button"
+                        aria-pressed={tag === tg}
+                        onClick={() => setTag(tag === tg ? null : tg)}
+                        className="inline-block bg-line/50 px-2 py-1 transition-[color,transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-line hover:text-accent aria-pressed:text-accent"
+                      >
+                        #{tg}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex gap-4 text-sm">
+                  {p.caseStudy && (
+                    <Link href={`/projects/${p.slug}`} className="group-hover:text-accent after:absolute after:inset-0">
+                      {t("case")}{" "}
+                      <span className="inline-block transition-transform duration-300 group-hover:translate-x-1.5">
+                        →
+                      </span>
+                    </Link>
                   )}
-                  {p.downloads !== undefined && (
-                    <span>
-                      ↓ {p.downloads.toLocaleString(locale)} {t("downloads")}
-                    </span>
+                  {p.repo && (
+                    <a href={`https://github.com/${p.repo}`} className="relative z-10 text-muted hover:text-fg">
+                      {t("source")} ↗
+                    </a>
                   )}
-                </span>
-              </div>
-              <ViewTransition name={`project-title-${p.slug}`} share="morph" default="none">
-                <h3 className="w-fit text-2xl font-semibold tracking-tight">{p.title}</h3>
-              </ViewTransition>
-              <p className="text-muted">{p.summary[locale]}</p>
-              <ul className="relative z-10 mt-auto flex flex-wrap gap-2 font-mono text-xs">
-                {p.tags.map((tg) => (
-                  <li key={tg}>
-                    <button
-                      type="button"
-                      aria-pressed={tag === tg}
-                      onClick={() => setTag(tag === tg ? null : tg)}
-                      className="bg-surface px-2 py-1 transition-colors hover:text-accent aria-pressed:text-accent"
-                    >
-                      #{tg}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex gap-4 text-sm">
-                {p.caseStudy && (
-                  <Link href={`/projects/${p.slug}`} className="group-hover:text-accent after:absolute after:inset-0">
-                    {t("case")} →
-                  </Link>
-                )}
-                {p.repo && (
-                  <a href={`https://github.com/${p.repo}`} className="relative z-10 text-muted hover:text-fg">
-                    {t("source")} ↗
-                  </a>
-                )}
-                {p.url && (
-                  <a href={p.url} className="relative z-10 text-muted hover:text-fg">
-                    {new URL(p.url).hostname} ↗
-                  </a>
-                )}
-              </div>
+                  {p.url && (
+                    <a href={p.url} className="relative z-10 text-muted hover:text-fg">
+                      {new URL(p.url).hostname} ↗
+                    </a>
+                  )}
+                </div>
+              </Tilt>
             </motion.li>
           ))}
         </AnimatePresence>

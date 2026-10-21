@@ -5,7 +5,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { modeStore, useRenderMode } from "@/lib/store";
 
 const button =
-  "inline-flex h-9 items-center justify-center border border-line px-3 font-mono text-xs uppercase tracking-wider transition-colors hover:border-fg hover:text-fg";
+  "inline-flex h-9 items-center justify-center border border-line px-3 font-mono text-xs uppercase tracking-wider transition-[color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-fg hover:text-fg active:translate-y-0";
 
 export function ModeToggle() {
   const t = useTranslations("mode");

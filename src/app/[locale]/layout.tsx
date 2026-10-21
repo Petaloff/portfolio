@@ -8,6 +8,7 @@ import { Analytics } from "@/components/Analytics";
 import { EasterEgg } from "@/components/EasterEgg";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { Background } from "@/components/three/Background";
 import { routing, type Locale } from "@/i18n/routing";
@@ -70,6 +71,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
           <SmoothScroll />
           <Background name={site.name.toUpperCase()} />
           <Header />
+          <ScrollProgress />
           <main id="main">{children}</main>
           <Footer />
           <Analytics />

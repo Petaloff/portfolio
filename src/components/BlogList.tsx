@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
@@ -9,6 +10,7 @@ export function BlogList({ posts }: { posts: Post[] }) {
   const t = useTranslations("blog");
   const locale = useLocale();
   const [tag, setTag] = useState<string | null>(null);
+  const reduce = useReducedMotion();
   const tags = [...new Set(posts.flatMap((p) => p.tags))].sort();
   const visible = tag ? posts.filter((p) => p.tags.includes(tag)) : posts;
 
@@ -31,11 +33,17 @@ export function BlogList({ posts }: { posts: Post[] }) {
       </div>
       {/* Posts read like `git log`: a short hash, then the "commit message" */}
       <ul className="divide-y divide-line border-y border-line">
-        {visible.map((p) => (
-          <li key={p.slug}>
+        {visible.map((p, i) => (
+          <motion.li
+            key={p.slug}
+            initial={reduce ? false : { opacity: 0, x: -16 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-5% 0px" }}
+            transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+          >
             <Link
               href={`/blog/${p.slug}`}
-              className="group grid gap-2 py-6 md:grid-cols-[10rem_1fr_auto] md:items-baseline md:gap-8"
+              className="group relative grid gap-2 py-6 transition-[padding] duration-300 before:absolute before:inset-y-0 before:left-0 before:w-px before:origin-top before:scale-y-0 before:bg-accent before:transition-transform before:duration-300 hover:pl-4 hover:before:scale-y-100 md:grid-cols-[10rem_1fr_auto] md:items-baseline md:gap-8"
             >
               <span className="font-mono text-xs text-muted">
                 <span className="text-accent">● {shortHash(p.slug)}</span>
@@ -53,7 +61,7 @@ export function BlogList({ posts }: { posts: Post[] }) {
                 ({p.tags.map((tag) => `#${tag}`).join(" ")}) [{p.lang}]
               </span>
             </Link>
-          </li>
+          </motion.li>
         ))}
       </ul>
     </div>
