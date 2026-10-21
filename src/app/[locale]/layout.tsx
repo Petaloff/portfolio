@@ -13,7 +13,9 @@ import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { AmbientVoxels } from "@/components/three/AmbientVoxels";
 import { Background } from "@/components/three/Background";
+import { Overlay } from "@/components/three/Overlay";
 import { routing, type Locale } from "@/i18n/routing";
+import { mcUsername } from "@/lib/minecraft";
 import { pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 import "../globals.css";
@@ -74,12 +76,13 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
           <AmbientVoxels />
           {/* Reads the pathname, so it streams in on pages that render at request time */}
           <Suspense>
-            <Background name={site.name.toUpperCase()} />
+            <Background name={site.name.toUpperCase()} skin={mcUsername} />
           </Suspense>
           <Header />
           <ScrollProgress />
           <main id="main">{children}</main>
           <Footer />
+          <Overlay />
           <Analytics />
           <EasterEgg />
         </NextIntlClientProvider>

@@ -30,8 +30,7 @@ export async function Minecraft() {
     <EditorWindow id="minecraft" title={t("title")}>
       <div className="grid items-center gap-10 md:grid-cols-[auto_1fr]">
         <figure className="flex flex-col items-center gap-2">
-          <SkinViewer username={mcUsername} />
-          <figcaption className="hidden font-mono text-[11px] text-muted md:block">↻ {t("drag")}</figcaption>
+          <SkinViewer username={mcUsername} hint={t("drag")} />
         </figure>
         <div className="font-mono text-sm leading-8">
           <p className="mb-4 text-muted"># {t("lead")}</p>

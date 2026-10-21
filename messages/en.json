@@ -75,7 +75,8 @@
   "mode": {
     "enable3d": "Enable 3D",
     "disable3d": "Disable 3D",
-    "hint": "This is the light version. Want the cubes? Turn on 3D up top."
+    "hint": "This is the light version. Want the cubes? Turn on 3D up top.",
+    "failed": "3D couldn't start on this device, so you're on the light version."
   },
   "locale": {
     "switch": "Русский"
@@ -104,7 +105,7 @@
     "planned": "planned",
     "online": "online",
     "offline": "offline",
-    "drag": "drag to rotate"
+    "drag": "drag to rotate, click to wave"
   },
   "now": {
     "title": "Now",
@@ -123,7 +124,8 @@
   },
   "activity": {
     "title": "How I commit",
-    "hint": "drag to rotate, hover a column",
+    "hint": "drag to rotate, hover a column, click to open that day",
+    "view": "Calendar view",
     "day": "{count, plural, =0 {no contributions} one {# contribution} other {# contributions}}"
   },
   "guestbook": {

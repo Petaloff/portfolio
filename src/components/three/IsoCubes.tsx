@@ -1,6 +1,17 @@
 import type { CSSProperties } from "react";
+import type { Voxel } from "./voxelArt";
 
-export type Voxel = [number, number, number];
+export type { Voxel };
+
+// Tight SVG viewBox around a cluster drawn by IsoCubes at the given cube size
+export function isoViewBox(cubes: Voxel[], size = 28) {
+  const h = size * 0.87;
+  const xs = cubes.map(([x, , z]) => (x - z) * h);
+  const ys = cubes.map(([x, y, z]) => (x + z) * size * 0.5 - y * size);
+  const minX = Math.min(...xs) - h;
+  const minY = Math.min(...ys) - size;
+  return `${minX} ${minY} ${Math.max(...xs) + h - minX} ${Math.max(...ys) + size - minY}`;
+}
 
 // Draws a voxel cluster as flat isometric cubes: a lit top, a mid-tone left
 // face and a dark right face. Shared by the lite hero and the ambient layer.

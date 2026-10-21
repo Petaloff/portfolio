@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, ViewTransition } from "react";
 import { Tilt } from "@/components/motion/Tilt";
+import { ProjectCover } from "@/components/ProjectCover";
 import { Link } from "@/i18n/navigation";
 import type { Project, ProjectCategory } from "../../content/projects";
 
@@ -79,11 +80,14 @@ export function ProjectGrid({ projects }: { projects: Item[] }) {
                     )}
                   </span>
                 </div>
-                <ViewTransition name={`project-title-${p.slug}`} share="morph" default="none">
-                  <h3 className="w-fit text-2xl font-semibold tracking-tight transition-transform duration-300 group-hover:translate-x-1">
-                    {p.title}
-                  </h3>
-                </ViewTransition>
+                <div className="flex items-start justify-between gap-4">
+                  <ViewTransition name={`project-title-${p.slug}`} share="morph" default="none">
+                    <h3 className="w-fit text-2xl font-semibold tracking-tight transition-transform duration-300 group-hover:translate-x-1">
+                      {p.title}
+                    </h3>
+                  </ViewTransition>
+                  {p.categories[0] && <ProjectCover category={p.categories[0]} />}
+                </div>
                 <p className="text-muted">{p.summary[locale]}</p>
                 <ul className="relative z-10 mt-auto flex flex-wrap gap-2 font-mono text-xs">
                   {p.tags.map((tg) => (

@@ -51,7 +51,11 @@ function detectMode(): RenderMode {
   try {
     webgl = !!document.createElement("canvas").getContext("webgl2");
   } catch {}
-  return fine && wide && !calm && memory >= 4 && webgl ? "full" : "lite";
+  // Touch tablets get 3D too when they look strong enough; the scenes swap
+  // the cursor for the gyroscope there
+  const cores = navigator.hardwareConcurrency ?? 4;
+  const pointer = fine || cores >= 4;
+  return pointer && wide && !calm && memory >= 4 && webgl ? "full" : "lite";
 }
 
 export const modeStore = createStore<RenderMode>(
@@ -60,6 +64,11 @@ export const modeStore = createStore<RenderMode>(
   "lite",
 );
 export const useRenderMode = () => useStore(modeStore);
+
+// The contribution calendar can be flat even while the rest of the site is 3D
+export type CityView = "3d" | "2d";
+export const cityViewStore = createStore<CityView>("city-view", (saved) => (saved === "2d" ? "2d" : "3d"), "3d");
+export const useCityView = () => useStore(cityViewStore);
 
 export type Consent = "granted" | "denied" | "unset";
 
