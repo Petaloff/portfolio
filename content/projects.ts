@@ -1,5 +1,6 @@
-// Draft entries: replace with your real projects. `caseStudy: true` means
-// there are content/projects/<slug>.<locale>.mdx files with the full story.
+// Default entries, used until projects are edited in the admin panel (then they
+// live in Redis). `caseStudy: true` means the project has its own page: either
+// content/projects/<slug>.<locale>.mdx files or a `story` written in the admin.
 // A project can belong to several categories, e.g. a Discord bot with a web dashboard
 export type ProjectCategory = "discord" | "minecraft" | "web";
 
@@ -14,6 +15,7 @@ export type Project = {
   modrinth?: string; // Modrinth project slug, used for live downloads
   url?: string;
   caseStudy?: boolean;
+  story?: { ru: string; en: string }; // plain text case study, paragraphs split by blank lines
 };
 
 export const projects: Project[] = [

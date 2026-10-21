@@ -14,6 +14,9 @@ export async function Footer() {
         <Link href="/guestbook" className="hover:text-fg">
           {t("nav.guestbook")}
         </Link>
+        <Link href="/terms" className="hover:text-fg">
+          {t("terms.title")}
+        </Link>
         <Link href="/privacy" className="hover:text-fg">
           {t("privacy.title")}
         </Link>

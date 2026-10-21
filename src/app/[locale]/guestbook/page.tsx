@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { auth, authEnabled, authProviders, authSecret } from "@/auth";
+import { getSession, authEnabled, authProviders, authSecret } from "@/auth";
 import { GuestbookForm } from "@/components/guestbook/GuestbookForm";
 import { DeleteEntry } from "@/components/guestbook/DeleteEntry";
 import { Reveal } from "@/components/Reveal";
@@ -22,7 +22,7 @@ const providerLabel = { github: "GitHub", discord: "Discord" } as const;
 async function Composer() {
   const t = await getTranslations("guestbook");
   const locale = await getLocale();
-  const session = await auth();
+  const session = await getSession();
   const back = `/${locale}/guestbook`;
 
   if (!session) {
@@ -42,15 +42,22 @@ async function Composer() {
   return (
     <div>
       <GuestbookForm max={MAX_LENGTH} name={session.user.name} image={session.user.image ?? null} />
-      <form action={logout.bind(null, back)} className="mt-3">
-        <button className="font-mono text-xs text-muted hover:text-fg">{t("signOut")}</button>
-      </form>
+      <div className="mt-3 flex gap-4 font-mono text-xs">
+        <form action={logout.bind(null, back)}>
+          <button className="text-muted hover:text-fg">{t("signOut")}</button>
+        </form>
+        {session.user.owner && (
+          <a href={`/${locale}/admin`} className="text-accent hover:underline">
+            admin →
+          </a>
+        )}
+      </div>
     </div>
   );
 }
 
 async function AdminTools({ id }: { id: string }) {
-  const session = authEnabled ? await auth() : null;
+  const session = authEnabled ? await getSession() : null;
   return session?.user.admin ? <DeleteEntry id={id} /> : null;
 }
 

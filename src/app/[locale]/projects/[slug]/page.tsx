@@ -6,20 +6,21 @@ import { JsonLd } from "@/components/JsonLd";
 import { Reveal } from "@/components/Reveal";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { paragraphs } from "@/lib/paragraphs";
 import { getProject, getProjectCase, getProjects } from "@/lib/content";
 import { absolute, breadcrumbs, pageMetadata, personRef } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 type Params = PageProps<"/[locale]/projects/[slug]">["params"];
 
-export function generateStaticParams() {
-  return getProjects()
-    .filter((p) => p.caseStudy)
-    .map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  const slugs = (await getProjects()).filter((p) => p.caseStudy).map((p) => ({ slug: p.slug }));
+  // Cache Components needs at least one param to prerender; an unknown slug just renders the 404
+  return slugs.length > 0 ? slugs : [{ slug: "none" }];
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/projects/[slug]">): Promise<Metadata> {
-  const project = getProject((await params).slug);
+  const project = await getProject((await params).slug);
   const locale = (await getLocale()) as Locale;
   if (!project) return {};
   return pageMetadata({
@@ -47,9 +48,9 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
 async function ProjectCase({ params }: { params: Params }) {
   const { slug } = await params;
   const locale = (await getLocale()) as Locale;
-  const project = getProject(slug);
-  const Content = await getProjectCase(slug, locale);
-  if (!project || !Content) notFound();
+  const project = await getProject(slug);
+  const study = await getProjectCase(slug, locale);
+  if (!project || !study) notFound();
   const t = await getTranslations("projects");
   const path = `/${locale}/projects/${project.slug}`;
 
@@ -99,7 +100,7 @@ async function ProjectCase({ params }: { params: Params }) {
         </Reveal>
       </header>
       <div className="prose-mdx">
-        <Content />
+        {study.Content ? <study.Content /> : paragraphs(study.story).map((p, i) => <p key={i}>{p}</p>)}
       </div>
     </>
   );

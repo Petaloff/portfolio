@@ -2,8 +2,9 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import type { ComponentType } from "react";
-import { projects, type Project } from "../../content/projects";
+import type { Project } from "../../content/projects";
 import type { Locale } from "@/i18n/routing";
+import { getProjectList } from "./cms";
 
 export type PostMeta = {
   title: string;
@@ -47,17 +48,24 @@ export async function getPosts(): Promise<Post[]> {
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function getProjects(): Project[] {
-  return [...projects].sort((a, b) => b.year - a.year);
+export async function getProjects(): Promise<Project[]> {
+  return [...(await getProjectList())].sort((a, b) => b.year - a.year);
 }
 
-export function getProject(slug: string) {
-  return projects.find((p) => p.slug === slug) ?? null;
+export async function getProject(slug: string) {
+  return (await getProjectList()).find((p) => p.slug === slug) ?? null;
 }
 
+const PROJECTS_DIR = path.join(process.cwd(), "content", "projects");
+
+// The MDX case study when there is one, otherwise the plain text story from the admin
 export async function getProjectCase(slug: string, locale: Locale) {
-  const project = getProject(slug);
+  const project = await getProject(slug);
   if (!project?.caseStudy) return null;
-  const mod: MdxModule = await import(`../../content/projects/${slug}.${locale}.mdx`);
-  return mod.default;
+  if (fs.existsSync(path.join(PROJECTS_DIR, `${slug}.${locale}.mdx`))) {
+    const mod: MdxModule = await import(`../../content/projects/${slug}.${locale}.mdx`);
+    return { Content: mod.default };
+  }
+  const story = project.story?.[locale];
+  return story ? { story } : null;
 }

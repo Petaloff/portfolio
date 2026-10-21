@@ -1,8 +1,9 @@
 import { hasLocale } from "next-intl";
 import { getRequestConfig } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { getMessages } from "@/lib/cms";
 import * as rootParams from "next/root-params";
-import { routing } from "./routing";
+import { routing, type Locale } from "./routing";
 
 export default getRequestConfig(async ({ locale }) => {
   if (!locale) {
@@ -16,6 +17,7 @@ export default getRequestConfig(async ({ locale }) => {
 
   return {
     locale,
-    messages: (await import(`../../messages/${locale}.json`)).default,
+    // The JSON files with any texts edited in the admin panel on top
+    messages: await getMessages(locale as Locale),
   };
 });
