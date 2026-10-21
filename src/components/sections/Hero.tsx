@@ -14,7 +14,7 @@ export async function Hero() {
     <HeroFrame>
       <LiteVoxels />
       {/* Phones have no 3D scene, so the nickname is plain type there */}
-      <p aria-hidden className="mb-auto pt-6 font-mono text-[15vw] leading-none font-bold tracking-tighter md:hidden">
+      <p aria-hidden className="mb-14 font-mono text-[15vw] leading-none font-bold tracking-tighter md:hidden">
         PETALOFF<span className="text-accent">_</span>
       </p>
       <Reveal>
