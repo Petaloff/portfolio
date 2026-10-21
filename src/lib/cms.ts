@@ -3,16 +3,18 @@ import { cacheLife, cacheTag } from "next/cache";
 import { projects as defaultProjects, type Project } from "../../content/projects";
 import type { Locale } from "@/i18n/routing";
 import { applyOverrides, type FlatMessages, type MessageTree } from "./admin/messages";
+import type { StoredPost } from "./admin/posts";
 import { legalDefaults, type LegalDoc } from "./legal";
 import { redis } from "./redis";
 
 // Content the owner edits in the admin panel. Each reader falls back to the
 // files in the repo when Redis is not set up, empty or unreachable
 
-export const TAGS = { projects: "projects", messages: "messages", legal: "legal" } as const;
+export const TAGS = { projects: "projects", posts: "posts", messages: "messages", legal: "legal" } as const;
 
 const keys = {
   projects: "content:projects",
+  posts: "content:posts",
   messages: (locale: Locale) => `content:messages:${locale}`,
   legal: (doc: LegalDoc, locale: Locale) => `content:legal:${doc}:${locale}`,
 };
@@ -40,6 +42,20 @@ export async function saveProjectList(list: Project[]) {
 
 export async function resetProjectList() {
   await redis!.del(keys.projects);
+}
+
+// Posts written in the admin panel, drafts included
+export async function getStoredPosts(): Promise<StoredPost[]> {
+  "use cache";
+  cacheTag(TAGS.posts);
+  cacheLife("max");
+  const saved = await read<StoredPost[]>(keys.posts);
+  return Array.isArray(saved) ? saved : [];
+}
+
+export async function saveStoredPosts(list: StoredPost[]) {
+  if (list.length === 0) await redis!.del(keys.posts);
+  else await redis!.set(keys.posts, list);
 }
 
 export async function defaultMessages(locale: Locale): Promise<MessageTree> {

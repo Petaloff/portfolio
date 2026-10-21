@@ -15,13 +15,17 @@ const errors: Record<NonNullable<NonNullable<AdminState>["error"]>, string> = {
   input: "Что-то не так с данными формы",
   icu: "Сломан синтаксис ICU в ключах",
   slug: "Slug: латиница, цифры и дефисы, до 48 символов",
-  title: "Нужно название до 80 символов",
+  title: "Нужно название, и не слишком длинное",
   summary: "Нужно описание на обоих языках",
   category: "Выбери хотя бы одну категорию",
   year: "Год выглядит странно",
   repo: "Репозиторий в виде owner/name",
   url: "Ссылка должна начинаться с http(s)://",
-  duplicate: "Проект с таким slug уже есть",
+  duplicate: "Такой slug уже занят",
+  description: "Нужно описание до 300 символов",
+  date: "Дата в формате ГГГГ-ММ-ДД",
+  lang: "Язык: ru или en",
+  body: "Нужен текст поста",
 };
 
 export function Status({ state, pending }: { state: AdminState; pending?: boolean }) {

@@ -6,21 +6,29 @@ import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { requireOwner } from "@/lib/admin/guard";
 import { diffOverrides, flatten, invalidMessages } from "@/lib/admin/messages";
+import { parsePost, upsertPost, type PostError } from "@/lib/admin/posts";
 import { parseProject, upsertProject, type ProjectError } from "@/lib/admin/projects";
 import {
   defaultMessages,
   getProjectList,
+  getStoredPosts,
   resetProjectList,
   saveLegal,
   saveMessageOverrides,
   saveProjectList,
+  saveStoredPosts,
   TAGS,
 } from "@/lib/cms";
+import { getPostFileSlugs } from "@/lib/content";
 import { clearEntries, removeEntry } from "@/lib/guestbook";
 import { LEGAL_DOCS, type LegalDoc } from "@/lib/legal";
 import { storageEnabled } from "@/lib/redis";
 
-export type AdminState = { ok?: true; error?: ProjectError | "storage" | "icu" | "input"; keys?: string[] } | null;
+export type AdminState = {
+  ok?: true;
+  error?: ProjectError | PostError | "storage" | "icu" | "input";
+  keys?: string[];
+} | null;
 
 const asLocale = (value: FormDataEntryValue | null): Locale | null =>
   routing.locales.includes(value as Locale) ? (value as Locale) : null;
@@ -73,6 +81,28 @@ export async function resetProjects(): Promise<AdminState> {
   if (blocked) return blocked;
   await resetProjectList();
   refresh(TAGS.projects);
+  return { ok: true };
+}
+
+export async function savePost(_: AdminState, form: FormData): Promise<AdminState> {
+  const blocked = await guard();
+  if (blocked) return blocked;
+  const parsed = parsePost(form);
+  if ("error" in parsed) return { error: parsed.error };
+  const original = String(form.get("original") ?? "") || null;
+  const result = upsertPost(await getStoredPosts(), parsed.post, original, getPostFileSlugs());
+  if ("error" in result) return { error: result.error };
+  await saveStoredPosts(result.list);
+  refresh(TAGS.posts);
+  return { ok: true };
+}
+
+// Removes a post written in the admin panel; for an edited file post the file version comes back
+export async function deletePost(slug: string): Promise<AdminState> {
+  const blocked = await guard();
+  if (blocked) return blocked;
+  await saveStoredPosts((await getStoredPosts()).filter((p) => p.slug !== slug));
+  refresh(TAGS.posts);
   return { ok: true };
 }
 
