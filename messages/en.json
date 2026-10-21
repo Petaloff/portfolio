@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Petaloff — fullstack developer",
-    "description": "Petaloff's portfolio: Discord bots, Minecraft mods and plugins on Fabric and Paper, web on Next.js. Project case studies and a devlog."
+    "description": "Hi, I'm Petaloff. I write Discord bots, Minecraft mods and plugins on Fabric and Paper, and the odd Next.js site. Here are my projects, how they work, and a devlog."
   },
   "nav": {
     "about": "About",
@@ -16,21 +16,21 @@
     "guestbook": "Guestbook"
   },
   "hero": {
-    "kicker": "Fullstack developer",
-    "title": "I build Discord bots and Minecraft mods",
-    "lead": "Backends that survive thousands of servers, and plugins that are fun to play with.",
-    "cta": "See projects",
-    "scroll": "Scroll"
+    "kicker": "Hi, I'm Petaloff",
+    "title": "I write Discord bots and Minecraft mods",
+    "lead": "I like bots that quietly run on a thousand servers and mods you want to install twice. That's what I make.",
+    "cta": "See what I've built",
+    "scroll": "Keep scrolling"
   },
   "about": {
     "title": "About",
-    "body": "Draft: a short story about how you got into development, what you work on now and what excites you. I will draft it from your repositories and you will edit it.",
-    "status": "Now on Discord"
+    "body": "It started with Minecraft: first I poked at other people's plugins, then I started writing my own. Then came Discord bots for friends, which slowly grew into a real backend. These days I write Fabric mods, Paper plugins and sometimes sites like this one. My favourite part is making something complicated feel simple.",
+    "status": "What I'm up to on Discord"
   },
   "projects": {
-    "title": "Projects",
+    "title": "Things I've built",
     "all": "All",
-    "case": "Read case study",
+    "case": "How it went",
     "source": "Source",
     "back": "All projects",
     "downloads": "downloads",
@@ -39,10 +39,10 @@
     "minecraft": "Minecraft",
     "web": "Web",
     "clearTag": "×",
-    "empty": "Nothing found."
+    "empty": "Nothing here. Try another filter."
   },
   "stats": {
-    "title": "By the numbers",
+    "title": "A few numbers",
     "repos": "public repositories",
     "stars": "GitHub stars",
     "downloads": "Modrinth downloads",
@@ -50,21 +50,21 @@
   },
   "stack": {
     "title": "Stack",
-    "lead": "The tools my projects are built on."
+    "lead": "What I write with every day and trust in production."
   },
   "blog": {
     "title": "Blog",
-    "lead": "Devlog, breakdowns and notes. Each post is written in whichever language fits it.",
+    "lead": "I write about what I'm building: what broke, how I fixed it and what I learned on the way. Each post is in whichever language fits.",
     "all": "All",
     "read": "Read",
-    "empty": "No posts yet.",
+    "empty": "Nothing written yet, but it's coming.",
     "back": "All posts",
     "rss": "RSS",
     "lang": "Post language"
   },
   "contact": {
-    "title": "Contact",
-    "lead": "Discord or Telegram is the fastest way to reach me."
+    "title": "Let's talk",
+    "lead": "Got an idea, a bug, or just want to chat? Message me on Discord or Telegram, that's where I answer fastest."
   },
   "discord": {
     "online": "online",
@@ -75,28 +75,28 @@
   "mode": {
     "enable3d": "Enable 3D",
     "disable3d": "Disable 3D",
-    "hint": "Lightweight version. You can turn 3D on at any time."
+    "hint": "This is the light version. Want the cubes? Turn on 3D up top."
   },
   "locale": {
     "switch": "Русский"
   },
   "consent": {
-    "text": "May I collect detailed anonymous analytics (clicks, scrolling, device) with PostHog? Without your consent only a basic cookie-free counter runs.",
-    "accept": "Allow",
-    "decline": "Decline",
+    "text": "Mind if I see how you use the site? Anonymously, with PostHog: clicks, scrolling, device. If not, only a simple cookie-free counter runs.",
+    "accept": "Sure, go ahead",
+    "decline": "No thanks",
     "policy": "Learn more",
     "manage": "Analytics settings"
   },
   "privacy": {
     "title": "Privacy",
-    "description": "What the site collects: anonymous analytics, PostHog only with consent, Discord status and comments."
+    "description": "What this site collects, honestly: anonymous stats, PostHog only if you say yes, Discord status and comments."
   },
   "footer": {
-    "made": "Built with Next.js and Three.js"
+    "made": "Hand-built with Next.js and Three.js"
   },
   "minecraft": {
     "title": "Minecraft",
-    "lead": "My skin and the server where I test my mods.",
+    "lead": "Here's my skin and the server where I test my mods before release.",
     "planned": "planned",
     "online": "online",
     "offline": "offline",
@@ -104,38 +104,38 @@
   },
   "now": {
     "title": "Now",
-    "lead": "What I am up to these days.",
+    "lead": "What I'm busy with right now. I update it when things change.",
     "updated": "Updated",
     "listening": "Now playing",
-    "silence": "Nothing playing on Spotify right now."
+    "silence": "Spotify is quiet right now."
   },
   "changelog": {
     "title": "Changelog",
-    "lead": "Every mod release from Modrinth and project release from GitHub in one feed. Refreshed hourly.",
-    "empty": "No releases yet, or the sources are unavailable right now."
+    "lead": "All my releases in one place: mods from Modrinth and projects from GitHub. The feed refreshes hourly.",
+    "empty": "No releases yet, or Modrinth and GitHub aren't answering right now."
   },
   "easter": {
     "given": "Gave 64 [Voxel] to You"
   },
   "activity": {
-    "title": "GitHub activity",
+    "title": "How I commit",
     "hint": "drag to rotate, hover a column",
     "day": "{count, plural, =0 {no contributions} one {# contribution} other {# contributions}}"
   },
   "guestbook": {
     "title": "Guestbook",
-    "lead": "Leave a few words: feedback, an idea or just a hello. Sign in with Discord or GitHub and your avatar comes along.",
+    "lead": "Leave a few words: feedback, an idea or just a hello. I genuinely enjoy reading them. Sign in with Discord or GitHub and your avatar comes along.",
     "signIn": "Sign in with",
     "signOut": "Sign out",
     "placeholder": "Hello from…",
     "submit": "Sign the guestbook",
-    "empty": "Nothing here yet. Be the first.",
+    "empty": "Nobody yet. Want to be first?",
     "disabled": "the guestbook isn't connected yet",
     "delete": "delete",
     "error": {
-      "empty": "Write something first",
-      "long": "Too long",
-      "rate": "Once a minute at most",
+      "empty": "Write at least a few words",
+      "long": "That's a bit long, trim it down",
+      "rate": "Give it a minute before the next one",
       "auth": "Sign in first"
     }
   }
