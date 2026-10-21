@@ -65,6 +65,11 @@ export const modeStore = createStore<RenderMode>(
 );
 export const useRenderMode = () => useStore(modeStore);
 
+// The contribution calendar can be flat even while the rest of the site is 3D
+export type CityView = "3d" | "2d";
+export const cityViewStore = createStore<CityView>("city-view", (saved) => (saved === "2d" ? "2d" : "3d"), "3d");
+export const useCityView = () => useStore(cityViewStore);
+
 export type Consent = "granted" | "denied" | "unset";
 
 export const consentStore = createStore<Consent>(

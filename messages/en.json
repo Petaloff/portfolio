@@ -125,6 +125,7 @@
   "activity": {
     "title": "How I commit",
     "hint": "drag to rotate, hover a column, click to open that day",
+    "view": "Calendar view",
     "day": "{count, plural, =0 {no contributions} one {# contribution} other {# contributions}}"
   },
   "guestbook": {

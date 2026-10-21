@@ -2,19 +2,14 @@
 
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { Component, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Component, useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "@/i18n/navigation";
 import { usePhone } from "@/lib/media";
 import { modeStore, useRenderMode } from "@/lib/store";
-import { LiteVoxels } from "./LiteVoxels";
+import { IsoCubes, isoViewBox } from "./IsoCubes";
+import { models } from "./voxelArt";
 
 const VoxelScene = dynamic(() => import("./VoxelScene"), { ssr: false });
-
-function subscribeScroll(onChange: () => void) {
-  addEventListener("scroll", onChange, { passive: true });
-  return () => removeEventListener("scroll", onChange);
-}
-const pastHero = () => scrollY > innerHeight * 0.9;
 
 // Anything thrown while setting up WebGL drops the visitor to the light version
 class SceneBoundary extends Component<{ onFail: () => void; children: ReactNode }, { failed: boolean }> {
@@ -30,8 +25,17 @@ class SceneBoundary extends Component<{ onFail: () => void; children: ReactNode 
   }
 }
 
-// While the WebGL chunk loads, the light cluster holds the spot; it fades out
-// once the scene has drawn its first frame and the name starts assembling
+// While the WebGL chunk loads, a flat voxel block bobs where the name will
+// appear; it fades out once the scene has drawn its first frame
+function Placeholder() {
+  const { voxels, accent } = models.grass;
+  return (
+    <svg viewBox={isoViewBox(voxels)} className="absolute top-[14%] left-1/2 w-40 -translate-x-1/2 opacity-40">
+      <IsoCubes cubes={voxels} accent={(v) => accent[voxels.indexOf(v)]} float />
+    </svg>
+  );
+}
+
 function FullScene({ name, onFail }: { name: string; onFail: () => void }) {
   const [ready, setReady] = useState(false);
   const [gone, setGone] = useState(false);
@@ -47,20 +51,20 @@ function FullScene({ name, onFail }: { name: string; onFail: () => void }) {
           className={`absolute inset-0 transition-opacity duration-700 ${ready ? "opacity-0" : ""}`}
           onTransitionEnd={(e) => ready && e.target === e.currentTarget && setGone(true)}
         >
-          <LiteVoxels />
+          <Placeholder />
         </div>
       )}
     </>
   );
 }
 
-// The voxel name lives on the home page only. In 3D it stays for the whole
-// page and changes shape with the sections; the light cluster fades past the hero
+// The voxel name lives on the home page only, in 3D. It stays for the whole
+// page and changes shape with the sections. The light version's cluster is
+// part of the hero itself (LiteVoxels), so it scrolls away with it
 export function Background({ name }: { name: string }) {
   const t = useTranslations("mode");
   const mode = useRenderMode();
   const pathname = usePathname();
-  const hidden = useSyncExternalStore(subscribeScroll, pastHero, () => false);
   const phone = usePhone();
   const [failed, setFailed] = useState(false);
 
@@ -84,18 +88,12 @@ export function Background({ name }: { name: string }) {
     </p>
   );
 
-  if (pathname !== "/" || phone) return notice || null;
+  if (pathname !== "/" || phone || mode !== "full") return notice || null;
 
   return (
     <>
       <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden>
-        {mode === "full" ? (
-          <FullScene name={name} onFail={fail} />
-        ) : (
-          <div className={`absolute inset-0 transition-opacity duration-500 ${hidden ? "opacity-0" : ""}`}>
-            <LiteVoxels />
-          </div>
-        )}
+        <FullScene name={name} onFail={fail} />
       </div>
       {notice}
     </>

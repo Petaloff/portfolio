@@ -6,7 +6,7 @@ import { onSceneWake, sceneState } from "@/lib/scene";
 import { useRenderMode } from "@/lib/store";
 
 // Rotating 3D skin on desktop in 3D mode, standing on a little grass block. It
-// only renders while on screen, walks while hovered, waves when clicked and
+// only renders while on screen, stops turning and walks while hovered, waves when clicked and
 // jumps with the easter egg. Phones get a flat head and the light version a
 // flat body render, so neither spends a WebGL context on it
 export function SkinViewer({ username, hint }: { username: string; hint: string }) {
@@ -56,10 +56,13 @@ export function SkinViewer({ username, hint }: { username: string; hint: string 
       io.observe(el);
 
       let waving: ReturnType<typeof setTimeout> | undefined;
+      // Hovering stops the spin so the skin can be looked at (and walks in place)
       const enter = () => {
+        viewer.autoRotate = false;
         if (!calm && !waving) viewer.animation = new WalkingAnimation();
       };
       const leave = () => {
+        viewer.autoRotate = !calm;
         if (!waving) viewer.animation = idle();
       };
       const click = () => {

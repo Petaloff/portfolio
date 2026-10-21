@@ -17,6 +17,7 @@ export type Formation = {
   accent: Uint8Array;
   width: number;
   height: number;
+  depth: number;
 };
 
 // Rasterise text on a 2D canvas and turn filled pixels into voxels centred on
@@ -64,6 +65,7 @@ export function buildName(text: string, budget = COUNT): Formation {
     accent,
     width: (Math.max(...xs) - Math.min(...xs)) * UNIT + SIZE,
     height: (Math.max(...ys) - Math.min(...ys)) * UNIT + SIZE,
+    depth: SIZE,
   };
 }
 
@@ -100,5 +102,6 @@ export function fromModel(model: Model, budget = COUNT): Formation {
     accent: flags,
     width: (max[0] - min[0]) * UNIT + SIZE,
     height: (max[1] - min[1]) * UNIT + SIZE,
+    depth: (max[2] - min[2]) * UNIT + SIZE,
   };
 }

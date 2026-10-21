@@ -65,6 +65,23 @@ function grassBlock(): Model {
   return out;
 }
 
+// A blocky head for the "about me" section: only the shell of an 8×8×8 cube,
+// with lit eyes and a dark mouth on the front face
+function head(): Model {
+  const face = ["########", "########", "########", "#++##++#", "########", "##....##", "########", "########"];
+  const out: Model = { voxels: [], accent: [] };
+  for (let x = 0; x < 8; x++)
+    for (let y = 0; y < 8; y++)
+      for (let z = 0; z < 8; z++) {
+        if (x > 0 && x < 7 && y > 0 && y < 7 && z > 0 && z < 7) continue;
+        const ch = z === 7 ? face[7 - y][x] : "#";
+        if (ch === ".") continue;
+        out.voxels.push([x, y, z]);
+        out.accent.push(ch === "+");
+      }
+  return out;
+}
+
 // A little block of towers, stand-in for the contribution city
 function skyline(): Model {
   const out: Model = { voxels: [], accent: [] };
@@ -84,6 +101,7 @@ export const models = {
   bubble,
   code,
   grass: grassBlock(),
+  head: head(),
   skyline: skyline(),
 };
 

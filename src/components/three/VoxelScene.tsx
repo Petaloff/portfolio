@@ -20,7 +20,7 @@ const CONTENT_WIDTH = 1152;
 
 // While a home page section is in the middle of the screen, the cubes take its shape
 const sections: Record<string, Shape> = {
-  about: "name",
+  about: "head",
   projects: "code",
   activity: "city",
   stack: "braces",
@@ -28,12 +28,14 @@ const sections: Record<string, Shape> = {
   blog: "hash",
   contact: "at",
 };
-type Shape = "name" | "code" | "city" | "braces" | "pickaxe" | "hash" | "at";
+type Shape = "name" | "head" | "code" | "city" | "braces" | "pickaxe" | "hash" | "at";
 
 function buildShape(shape: Shape, name: string, budget: number): Formation {
   switch (shape) {
     case "name":
       return buildName(name, budget);
+    case "head":
+      return fromModel(models.head, budget);
     case "code":
       return fromModel(models.code, budget);
     case "city":
@@ -177,14 +179,18 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     const sideX = (roomy ? size.width / 2 - margin / 2 : size.width * 0.36) * px;
     const sideW = (roomy ? margin * 0.7 : size.width * 0.18) * px;
     const fitHero = Math.min(1, (viewport.width * 0.8) / layout.width);
-    const fitSide = Math.min(sideW / layout.width, (viewport.height * (roomy ? 0.4 : 0.3)) / layout.height);
+    // The side figure turns, so solid shapes need room for their diagonal
+    const fitSide = Math.min(
+      sideW / Math.hypot(layout.width, layout.depth),
+      (viewport.height * (roomy ? 0.4 : 0.3)) / layout.height,
+    );
     const lambda = calm ? 60 : 6;
     const scale = THREE.MathUtils.damp(g.scale.x, THREE.MathUtils.lerp(fitHero, fitSide, side), lambda, dt);
     g.scale.setScalar(scale);
     g.position.x = THREE.MathUtils.damp(g.position.x, sideX * side, lambda, dt);
     g.position.y = THREE.MathUtils.damp(g.position.y, viewport.height * 0.26 * (1 - side), lambda, dt);
-    // Turns with the scroll so the side figure shows its depth
-    g.rotation.y = f.x * 0.12 * f.tilt + side * (0.45 + Math.sin(scrollY * 0.0015) * 0.35);
+    // Turns with the scroll so the side figure shows its depth, facing the content
+    g.rotation.y = f.x * 0.12 * f.tilt - side * (0.45 + Math.sin(scrollY * 0.0015) * 0.3);
     g.rotation.x = f.y * 0.08 * f.tilt + side * 0.18;
     mat.opacity = THREE.MathUtils.damp(mat.opacity, THREE.MathUtils.lerp(1, roomy ? 0.85 : 0.3, side), lambda, dt);
 
