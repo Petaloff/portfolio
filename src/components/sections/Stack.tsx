@@ -21,7 +21,9 @@ export async function Stack() {
               <span className="text-muted">: [</span>
               {group.items.map((item, i) => (
                 <span key={item}>
-                  <span className="text-amber-200/90">&quot;{item}&quot;</span>
+                  <span className="cursor-default text-amber-200/90 transition-colors duration-200 hover:text-accent">
+                    &quot;{item}&quot;
+                  </span>
                   {i < group.items.length - 1 && <span className="text-muted">, </span>}
                 </span>
               ))}

@@ -19,14 +19,14 @@ export async function Contact() {
                 href={c.href}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex flex-wrap items-baseline gap-x-3 py-2 text-xl md:text-3xl"
+                className="group flex flex-wrap items-baseline gap-x-3 py-2 text-xl transition-transform duration-300 hover:translate-x-2 md:text-3xl"
               >
-                <span className="text-accent">$</span>
+                <span className="text-accent transition-transform duration-300 group-hover:rotate-12">$</span>
                 <span className="text-muted">open</span>
                 <span className="font-sans font-semibold tracking-tight transition-colors group-hover:text-accent">
                   {c.label.toLowerCase()}
                 </span>
-                <span className="text-sm text-muted opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="-translate-x-2 text-sm text-muted opacity-0 transition-[opacity,translate] duration-300 group-hover:translate-x-0 group-hover:opacity-100">
                   → {c.href.replace(/^(https?:\/\/|mailto:)/, "")}
                 </span>
               </a>

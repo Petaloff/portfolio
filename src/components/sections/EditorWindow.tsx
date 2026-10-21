@@ -40,13 +40,13 @@ export function EditorWindow({
   return (
     <section id={id} className={`mx-auto max-w-6xl px-4 py-20 md:px-8 md:py-28 ${className}`}>
       <Reveal>
-        <div className="overflow-hidden border border-line bg-surface/60 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)]">
+        <div className="overflow-hidden border border-line bg-surface/60 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] duration-500 hover:border-line hover:shadow-[0_40px_90px_-40px_rgba(0,0,0,0.9),0_0_0_1px_color-mix(in_oklab,var(--accent)_18%,transparent)]">
           {/* Title bar with window controls and file tabs */}
           <div className="flex h-10 items-stretch border-b border-line bg-bg/60 font-mono text-xs">
             <div className="flex items-center gap-1.5 px-4" aria-hidden>
               <span className="h-2.5 w-2.5 bg-line" />
               <span className="h-2.5 w-2.5 bg-line" />
-              <span className="h-2.5 w-2.5 bg-accent/70" />
+              <span className="h-2.5 w-2.5 animate-pulse bg-accent/70" />
             </div>
             <nav className="flex min-w-0 overflow-x-auto" aria-label="files">
               {files.map((f) =>
@@ -62,7 +62,7 @@ export function EditorWindow({
                   <a
                     key={f.id}
                     href={`#${f.id}`}
-                    className="hidden shrink-0 items-center px-4 text-muted transition-colors hover:text-fg md:flex"
+                    className="hidden shrink-0 items-center px-4 text-muted transition-colors hover:bg-surface/60 hover:text-fg md:flex"
                   >
                     {f.name}
                   </a>

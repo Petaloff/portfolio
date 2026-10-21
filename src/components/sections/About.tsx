@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { CountUp } from "@/components/motion/CountUp";
 import { getLiveStats } from "@/lib/live";
 import { EditorWindow } from "./EditorWindow";
 
@@ -23,10 +24,16 @@ export async function About() {
             <div className="mb-2 text-xs text-muted">{"// stats.json · live, refreshed hourly"}</div>
             <div className="text-muted">{"{"}</div>
             {items.map((i, n) => (
-              <div key={i.key} className="pl-5" title={i.label}>
+              <div
+                key={i.key}
+                className="-mx-2 px-2 pl-7 transition-colors duration-200 hover:bg-line/40"
+                title={i.label}
+              >
                 <span className="text-sky-300">&quot;{i.key}&quot;</span>
                 <span className="text-muted">: </span>
-                <span className="text-accent">{i.value!.toLocaleString(locale)}</span>
+                <span className="text-accent">
+                  <CountUp value={i.value!} locale={locale} />
+                </span>
                 <span className="text-muted">{n < items.length - 1 ? "," : ""}</span>
                 <span className="ml-3 hidden text-xs text-muted/70 sm:inline">{`// ${i.label}`}</span>
               </div>
