@@ -181,7 +181,8 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     // 0 is the hero banner, 1 the side figure
     const side = smoothstep(0.35, 1, scrolled);
     // Off the hero the figure is what the head is thinking about, inside its cloud
-    const facing = headSide(sceneState.section);
+    // The figure stays in its cloud while the cloud bursts, then follows the head
+    const facing = headPhase(sceneState.section) === "thinking" ? headState.side : headSide(sceneState.section);
     const { roomy, cloud, inner } = thoughtPose(viewport, size, facing);
     const bob =
       !calm && headPhase(sceneState.section) === "thinking" ? cloudBob(performance.now() / 1000, cloud.height) : 0;
@@ -227,7 +228,8 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     let moving = 0;
     for (let i = 0; i < COUNT; i++) {
       // Base position eases into the current shape (assembly on load, morphs on scroll)
-      const k = calm ? 1 : 1 - Math.exp(-dt * speeds[i]);
+      // Waiting for its cloud, the figure shrinks away quickly rather than drifting
+      const k = calm ? 1 : 1 - Math.exp(-dt * speeds[i] * (waiting ? 4 : 1));
       const j = i * 3;
       const tx = layout.positions[j];
       const ty = layout.positions[j + 1];
