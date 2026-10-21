@@ -13,8 +13,10 @@ import { site } from "@/lib/site";
 
 type Params = PageProps<"/[locale]/blog/[slug]">["params"];
 
-export function generateStaticParams() {
-  return getPostSlugs().map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  const slugs = (await getPostSlugs()).map((slug) => ({ slug }));
+  // Cache Components needs at least one param to prerender; an unknown slug just renders the 404
+  return slugs.length > 0 ? slugs : [{ slug: "none" }];
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/blog/[slug]">): Promise<Metadata> {

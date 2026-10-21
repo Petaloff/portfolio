@@ -7,10 +7,12 @@ import { AdminPanel } from "@/components/admin/AdminPanel";
 import { GuestbookAdmin } from "@/components/admin/GuestbookAdmin";
 import { LegalEditor } from "@/components/admin/LegalEditor";
 import { MessagesEditor } from "@/components/admin/MessagesEditor";
+import { PostsEditor } from "@/components/admin/PostsEditor";
 import { ProjectsEditor } from "@/components/admin/ProjectsEditor";
 import { routing, type Locale } from "@/i18n/routing";
 import { flatten } from "@/lib/admin/messages";
-import { defaultMessages, getLegal, getMessageOverrides, getProjectList } from "@/lib/cms";
+import { defaultMessages, getLegal, getMessageOverrides, getProjectList, getStoredPosts } from "@/lib/cms";
+import { getEditablePosts } from "@/lib/content";
 import { getEntries } from "@/lib/guestbook";
 import { LEGAL_DOCS } from "@/lib/legal";
 import { storageEnabled } from "@/lib/redis";
@@ -53,8 +55,10 @@ async function Admin() {
   // Signed in as someone else: the page simply does not exist for them
   if (!session.user.owner) notFound();
 
-  const [projects, entries, messages, legal] = await Promise.all([
+  const [projects, posts, stored, entries, messages, legal] = await Promise.all([
     getProjectList(),
+    getEditablePosts(),
+    getStoredPosts(),
     getEntries(),
     Promise.all(
       routing.locales.map(async (l) => ({
@@ -92,6 +96,12 @@ async function Admin() {
             label: "Проекты",
             count: projects.length,
             content: <ProjectsEditor projects={projects} />,
+          },
+          {
+            id: "blog",
+            label: "Блог",
+            count: posts.length,
+            content: <PostsEditor posts={posts} saved={stored.map((p) => p.slug)} />,
           },
           { id: "messages", label: "Тексты сайта", content: <MessagesEditor locales={messages} /> },
           { id: "legal", label: "Соглашение", content: <LegalEditor texts={legal} /> },
