@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Petaloff — fullstack-разработчик",
-    "description": "Discord-боты, моды и плагины для Minecraft, веб. Портфолио и девлог."
+    "description": "Портфолио Petaloff: Discord-боты, моды и плагины для Minecraft на Fabric и Paper, веб на Next.js. Кейсы проектов и девлог."
   },
   "nav": {
     "about": "Обо мне",
@@ -88,7 +88,8 @@
     "manage": "Настройки статистики"
   },
   "privacy": {
-    "title": "Конфиденциальность"
+    "title": "Конфиденциальность",
+    "description": "Какие данные собирает сайт: обезличенная аналитика, PostHog только с согласия, Discord-статус и комментарии."
   },
   "footer": {
     "made": "Сделано на Next.js и Three.js"

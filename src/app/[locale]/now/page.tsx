@@ -4,10 +4,13 @@ import type { ComponentType } from "react";
 import { DiscordStatus } from "@/components/DiscordStatus";
 import { NowPlaying } from "@/components/NowPlaying";
 import { Reveal } from "@/components/Reveal";
+import type { Locale } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("now");
-  return { title: t("title"), description: t("lead") };
+  const locale = (await getLocale()) as Locale;
+  return pageMetadata({ locale, path: "/now", title: t("title"), description: t("lead") });
 }
 
 export default async function NowPage() {

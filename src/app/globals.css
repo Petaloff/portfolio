@@ -101,7 +101,19 @@ body {
   }
 }
 
+.logo-cursor {
+  animation: cursor-blink 1.1s step-end infinite;
+}
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .logo-cursor {
+    animation: none !important;
+  }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) {

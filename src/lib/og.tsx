@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { logoCursor, logoVoxels } from "./logo";
 
 export const ogSize = { width: 1200, height: 630 };
 export const ogContentType = "image/png";
@@ -11,11 +12,9 @@ const fonts = Promise.all([
   readFile(join(process.cwd(), "assets/fonts/Geist-Bold.ttf")),
 ]);
 
-// Small voxel cluster in the corner, echoing the site's 3D nickname
-const voxels: [number, number, boolean][] = [
-  [0, 0, false], [1, 0, false], [2, 0, true], [0, 1, false], [1, 1, false],
-  [0, 2, false], [3, 0, false], [1, 2, true], [2, 1, false], [0, 3, false],
-];
+// The voxel P logo in the corner
+const pitch = 34;
+const cell = 30;
 
 export async function renderOg({ kicker, title, subtitle }: { kicker: string; title: string; subtitle?: string }) {
   const [regular, bold] = await fonts;
@@ -35,25 +34,28 @@ export async function renderOg({ kicker, title, subtitle }: { kicker: string; ti
           position: "relative",
         }}
       >
-        <div style={{ position: "absolute", right: 72, top: 72, display: "flex" }}>
-          {voxels.map(([x, y, accent]) => (
+        <div style={{ position: "absolute", right: 72, top: 72, width: pitch * 4, height: pitch * 5, display: "flex" }}>
+          {logoVoxels.map(([x, y]) => (
             <div
               key={`${x}-${y}`}
-              style={{
-                position: "absolute",
-                right: x * 34,
-                top: y * 34,
-                width: 30,
-                height: 30,
-                background: accent ? "#7bd88f" : "#2a2a2d",
-              }}
+              style={{ position: "absolute", left: x * pitch, top: y * pitch, width: cell, height: cell, background: "#3a3a3e" }}
             />
           ))}
+          <div
+            style={{
+              position: "absolute",
+              left: logoCursor.x * pitch,
+              top: logoCursor.y * pitch,
+              width: logoCursor.width * pitch - (pitch - cell),
+              height: cell,
+              background: "#7bd88f",
+            }}
+          />
         </div>
         <div style={{ display: "flex", fontSize: 26, color: "#7bd88f", letterSpacing: 4, textTransform: "uppercase" }}>
           {kicker}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 960 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 840 }}>
           <div style={{ fontSize: title.length > 40 ? 64 : 80, fontWeight: 700, lineHeight: 1.05, letterSpacing: -2 }}>
             {title}
           </div>
