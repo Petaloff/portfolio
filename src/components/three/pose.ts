@@ -74,8 +74,10 @@ export function headSide(section: string) {
   return Math.max(0, shown.indexOf(section)) % 2 === 0 ? 1 : -1;
 }
 
-// Shared between the head and its cloud: the cloud only pops up once the head has landed
-export const headState = { flying: false };
+// Shared between the head, its cloud and the figure in it: the cloud only pops
+// up once the head has landed, and the figure only forms once the cloud is up
+// (cloud runs from 0, gone, to 1, fully shown)
+export const headState = { flying: false, cloud: 0 };
 
 // The cloud floats gently up and down, and the figure in it with it
 export const cloudBob = (t: number, height: number) => Math.sin(t * 1.3) * height * 0.06;
