@@ -207,7 +207,21 @@ body {
   }
 }
 
+/* The maintenance page progress bar sweeping back and forth */
+.maintenance-bar {
+  animation: maintenance-bar 2.4s ease-in-out infinite alternate;
+}
+@keyframes maintenance-bar {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 300% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .maintenance-bar,
   .voxel-float,
   .voxel-accent,
   .voxel-drift,
