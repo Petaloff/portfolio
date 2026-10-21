@@ -25,17 +25,19 @@ export async function Activity() {
         {/* rtl keeps the most recent weeks in view on narrow screens */}
         <div dir="rtl" className="overflow-x-auto pb-2">
           <div dir="ltr" className="grid w-max grid-flow-col grid-rows-7 gap-[3px]">
-            {weeks.flat().map((day, i) =>
-              day ? (
-                <span
-                  key={day.date}
-                  title={`${day.date} · ${t("day", { count: day.count })}`}
-                  className={`h-2.5 w-2.5 ${levelClass[level(day.count, max)]}`}
-                />
-              ) : (
-                <span key={`pad-${i}`} className="h-2.5 w-2.5" />
-              ),
-            )}
+            {weeks
+              .flat()
+              .map((day, i) =>
+                day ? (
+                  <span
+                    key={day.date}
+                    title={`${day.date} · ${t("day", { count: day.count })}`}
+                    className={`h-2.5 w-2.5 ${levelClass[level(day.count, max)]}`}
+                  />
+                ) : (
+                  <span key={`pad-${i}`} className="h-2.5 w-2.5" />
+                ),
+              )}
           </div>
         </div>
       </ContributionCity>

@@ -16,11 +16,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function NowPage() {
   const t = await getTranslations("now");
   const locale = await getLocale();
-  const mod: { default: ComponentType; meta: { updated: string } } = await import(`../../../../content/now/${locale}.mdx`);
+  const mod: { default: ComponentType; meta: { updated: string } } = await import(
+    `../../../../content/now/${locale}.mdx`
+  );
   const { default: Content, meta } = mod;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-24 pt-36 md:px-8">
+    <div className="mx-auto max-w-2xl px-4 pt-36 pb-24 md:px-8">
       <Reveal>
         <h1 className="text-5xl font-semibold tracking-tighter md:text-7xl">{t("title")}</h1>
         <p className="mt-6 text-muted">{t("lead")}</p>

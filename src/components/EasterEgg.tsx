@@ -5,7 +5,18 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { sceneState } from "@/lib/scene";
 
-const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+const KONAMI = [
+  "ArrowUp",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowLeft",
+  "ArrowRight",
+  "b",
+  "a",
+];
 const GIVE = "/give";
 
 // Pseudo-random but stable layout for the falling voxels

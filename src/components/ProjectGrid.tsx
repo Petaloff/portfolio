@@ -33,7 +33,7 @@ export function ProjectGrid({ projects }: { projects: Item[] }) {
             type="button"
             aria-pressed={category === c}
             onClick={() => setCategory(c)}
-            className={`${chip} uppercase tracking-wider`}
+            className={`${chip} tracking-wider uppercase`}
           >
             {t(c)}
           </button>
@@ -97,7 +97,7 @@ export function ProjectGrid({ projects }: { projects: Item[] }) {
               </ul>
               <div className="flex gap-4 text-sm">
                 {p.caseStudy && (
-                  <Link href={`/projects/${p.slug}`} className="after:absolute after:inset-0 group-hover:text-accent">
+                  <Link href={`/projects/${p.slug}`} className="group-hover:text-accent after:absolute after:inset-0">
                     {t("case")} →
                   </Link>
                 )}

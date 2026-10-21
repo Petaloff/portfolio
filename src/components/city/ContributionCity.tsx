@@ -27,7 +27,11 @@ export function ContributionCity({
 }) {
   const t = useTranslations("activity");
   const mode = useRenderMode();
-  const phone = useSyncExternalStore(subscribePhone, () => matchMedia(phoneQuery).matches, () => true);
+  const phone = useSyncExternalStore(
+    subscribePhone,
+    () => matchMedia(phoneQuery).matches,
+    () => true,
+  );
   const [hovered, setHovered] = useState<Day | null>(null);
 
   if (phone || mode !== "full") return children;

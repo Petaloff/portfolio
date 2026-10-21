@@ -11,7 +11,11 @@ function subscribePhone(onChange: () => void) {
 
 // Rotating 3D skin on desktop; phones get a flat head render instead of 3D
 export function SkinViewer({ username }: { username: string }) {
-  const phone = useSyncExternalStore(subscribePhone, () => matchMedia(phoneQuery).matches, () => true);
+  const phone = useSyncExternalStore(
+    subscribePhone,
+    () => matchMedia(phoneQuery).matches,
+    () => true,
+  );
   const canvas = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
 

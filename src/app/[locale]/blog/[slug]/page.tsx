@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/blog/[sl
 export default async function PostPage({ params }: PageProps<"/[locale]/blog/[slug]">) {
   const t = await getTranslations("blog");
   return (
-    <article className="mx-auto max-w-2xl px-4 pb-24 pt-36 md:px-8">
+    <article className="mx-auto max-w-2xl px-4 pt-36 pb-24 md:px-8">
       <Link href="/blog" className="font-mono text-xs text-muted hover:text-fg">
         ← {t("back")}
       </Link>
@@ -83,7 +83,7 @@ async function Post({ params }: { params: Params }) {
         }}
       />
       <Reveal>
-        <header className="mb-12 mt-8 border-b border-line pb-8">
+        <header className="mt-8 mb-12 border-b border-line pb-8">
           <div className="flex gap-4 font-mono text-xs text-muted">
             <time dateTime={post.date}>
               {new Date(post.date).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}

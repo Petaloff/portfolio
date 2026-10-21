@@ -36,7 +36,7 @@ export function NowPlaying() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={spotify.albumArt} alt={spotify.album} width={64} height={64} className="h-16 w-16" />
       <span className="min-w-0 flex-1">
-        <span className="block font-mono text-[11px] uppercase tracking-wider text-accent">♪ {t("listening")}</span>
+        <span className="block font-mono text-[11px] tracking-wider text-accent uppercase">♪ {t("listening")}</span>
         <span className="block truncate font-medium group-hover:text-accent">{spotify.song}</span>
         <span className="block truncate text-sm text-muted">{spotify.artist}</span>
         <span className="mt-2 block h-0.5 bg-line">
