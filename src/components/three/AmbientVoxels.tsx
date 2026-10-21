@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { IsoCubes, type Voxel } from "./IsoCubes";
+import { IsoCubes, isoViewBox, type Voxel } from "./IsoCubes";
 
 // A quiet layer of voxel clusters behind every page. Pure SVG and CSS: each
 // cluster drifts on its own slow loop, and where the browser supports
@@ -101,15 +101,6 @@ const clusters: Cluster[] = [
 
 const SIZE = 28;
 
-function viewBox(cubes: Voxel[]) {
-  const h = SIZE * 0.87;
-  const xs = cubes.map(([x, , z]) => (x - z) * h);
-  const ys = cubes.map(([x, y, z]) => (x + z) * SIZE * 0.5 - y * SIZE);
-  const minX = Math.min(...xs) - h;
-  const minY = Math.min(...ys) - SIZE;
-  return `${minX} ${minY} ${Math.max(...xs) + h - minX} ${Math.max(...ys) + SIZE - minY}`;
-}
-
 export function AmbientVoxels() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-20 overflow-hidden" aria-hidden>
@@ -123,7 +114,7 @@ export function AmbientVoxels() {
             style={{ left: c.left, top: c.top, width: c.width, "--shift": `${c.shift}px` } as CSSProperties}
           >
             <svg
-              viewBox={viewBox(cubes)}
+              viewBox={isoViewBox(cubes, SIZE)}
               className="voxel-drift block w-full"
               style={
                 {

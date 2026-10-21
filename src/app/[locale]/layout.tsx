@@ -13,6 +13,7 @@ import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { AmbientVoxels } from "@/components/three/AmbientVoxels";
 import { Background } from "@/components/three/Background";
+import { Overlay } from "@/components/three/Overlay";
 import { routing, type Locale } from "@/i18n/routing";
 import { pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -80,6 +81,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
           <ScrollProgress />
           <main id="main">{children}</main>
           <Footer />
+          <Overlay />
           <Analytics />
           <EasterEgg />
         </NextIntlClientProvider>

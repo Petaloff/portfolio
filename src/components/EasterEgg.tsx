@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { sceneState } from "@/lib/scene";
+import { burst } from "@/lib/scene";
 
 const KONAMI = [
   "ArrowUp",
@@ -45,7 +45,7 @@ export function EasterEgg() {
       if (konami === KONAMI.length || typed === GIVE) {
         konami = 0;
         typed = "";
-        sceneState.burstAt = performance.now();
+        burst();
         setRun((r) => r + 1);
       }
     };

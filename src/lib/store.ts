@@ -51,7 +51,11 @@ function detectMode(): RenderMode {
   try {
     webgl = !!document.createElement("canvas").getContext("webgl2");
   } catch {}
-  return fine && wide && !calm && memory >= 4 && webgl ? "full" : "lite";
+  // Touch tablets get 3D too when they look strong enough; the scenes swap
+  // the cursor for the gyroscope there
+  const cores = navigator.hardwareConcurrency ?? 4;
+  const pointer = fine || cores >= 4;
+  return pointer && wide && !calm && memory >= 4 && webgl ? "full" : "lite";
 }
 
 export const modeStore = createStore<RenderMode>(
