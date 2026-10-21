@@ -31,7 +31,7 @@ export function GuestbookForm({ max, name, image }: { max: number; name: string;
         placeholder={t("placeholder")}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="w-full resize-none border border-line bg-bg/60 p-3 text-sm outline-none transition-colors placeholder:text-muted focus:border-fg"
+        className="w-full resize-none border border-line bg-bg/60 p-3 text-sm transition-colors outline-none placeholder:text-muted focus:border-fg"
       />
       <div className="mt-3 flex items-center justify-between gap-4 font-mono text-xs">
         <span className={state?.error ? "text-rose-400" : "text-muted"} aria-live="polite">

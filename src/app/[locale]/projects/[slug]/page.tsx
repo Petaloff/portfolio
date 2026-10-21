@@ -22,13 +22,18 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/projects
   const project = getProject((await params).slug);
   const locale = (await getLocale()) as Locale;
   if (!project) return {};
-  return pageMetadata({ locale, path: `/projects/${project.slug}`, title: project.title, description: project.summary[locale] });
+  return pageMetadata({
+    locale,
+    path: `/projects/${project.slug}`,
+    title: project.title,
+    description: project.summary[locale],
+  });
 }
 
 export default async function ProjectPage({ params }: PageProps<"/[locale]/projects/[slug]">) {
   const t = await getTranslations("projects");
   return (
-    <article className="mx-auto max-w-3xl px-4 pb-24 pt-36 md:px-8">
+    <article className="mx-auto max-w-3xl px-4 pt-36 pb-24 md:px-8">
       <Link href="/#projects" className="font-mono text-xs text-muted hover:text-fg">
         ← {t("back")}
       </Link>
@@ -73,9 +78,9 @@ async function ProjectCase({ params }: { params: Params }) {
         }}
       />
       {/* No Reveal here: the header is the landing spot for the card morph */}
-      <header className="mb-12 mt-8 border-b border-line pb-8">
+      <header className="mt-8 mb-12 border-b border-line pb-8">
         <ViewTransition name={`project-meta-${project.slug}`} share="morph" default="none">
-          <p className="w-fit font-mono text-xs uppercase tracking-wider text-accent">
+          <p className="w-fit font-mono text-xs tracking-wider text-accent uppercase">
             {project.categories.map((c) => t(c)).join(" · ")} · {project.year}
           </p>
         </ViewTransition>

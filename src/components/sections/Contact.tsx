@@ -11,7 +11,7 @@ export async function Contact() {
         <p className="text-sm text-muted">
           <span className="text-accent">petaloff@dev</span>:~$ cat README
         </p>
-        <p className="mb-8 mt-2 text-sm">{t("lead")}</p>
+        <p className="mt-2 mb-8 text-sm">{t("lead")}</p>
         <ul className="space-y-1">
           {contacts.map((c) => (
             <li key={c.label}>
@@ -34,7 +34,8 @@ export async function Contact() {
           ))}
         </ul>
         <p className="mt-6 text-sm text-muted">
-          <span className="text-accent">petaloff@dev</span>:~$ <span className="inline-block h-4 w-2 translate-y-0.5 animate-pulse bg-fg" />
+          <span className="text-accent">petaloff@dev</span>:~${" "}
+          <span className="inline-block h-4 w-2 translate-y-0.5 animate-pulse bg-fg" />
         </p>
       </div>
     </EditorWindow>

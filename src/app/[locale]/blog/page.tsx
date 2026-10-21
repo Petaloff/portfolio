@@ -18,7 +18,7 @@ export default async function BlogPage() {
   const locale = await getLocale();
   const posts = await getPosts();
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-24 pt-36 md:px-8">
+    <div className="mx-auto max-w-3xl px-4 pt-36 pb-24 md:px-8">
       <JsonLd
         data={{
           "@type": "Blog",
@@ -37,7 +37,7 @@ export default async function BlogPage() {
       />
       <Reveal>
         <h1 className="text-5xl font-semibold tracking-tighter md:text-7xl">{t("title")}</h1>
-        <p className="mb-16 mt-6 max-w-lg text-muted">{t("lead")}</p>
+        <p className="mt-6 mb-16 max-w-lg text-muted">{t("lead")}</p>
       </Reveal>
       <Reveal delay={0.1}>
         <BlogList posts={posts} />

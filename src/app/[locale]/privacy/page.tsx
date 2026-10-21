@@ -29,14 +29,14 @@ export default async function PrivacyPage() {
   const t = await getTranslations();
   const locale = (await getLocale()) as keyof typeof text;
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-24 pt-36 md:px-8">
+    <div className="mx-auto max-w-2xl px-4 pt-36 pb-24 md:px-8">
       <h1 className="text-5xl font-semibold tracking-tighter">{t("privacy.title")}</h1>
       <div className="prose-mdx mt-10 text-muted">
         {text[locale].map((p) => (
           <p key={p}>{p}</p>
         ))}
       </div>
-      <h2 className="mb-4 mt-12 font-mono text-xs uppercase tracking-wider text-accent">{t("consent.manage")}</h2>
+      <h2 className="mt-12 mb-4 font-mono text-xs tracking-wider text-accent uppercase">{t("consent.manage")}</h2>
       <ConsentSettings />
     </div>
   );

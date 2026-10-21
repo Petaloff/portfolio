@@ -11,7 +11,6 @@ const ACCENT_EVERY = 11;
 // Phones get a coarser grid: fewer, bigger cubes stay crisp at small sizes
 const NARROW_BUDGET = 360;
 
-
 function readColors() {
   const style = getComputedStyle(document.documentElement);
   return {

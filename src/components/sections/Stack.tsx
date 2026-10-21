@@ -7,7 +7,7 @@ export async function Stack() {
   const t = await getTranslations("stack");
   return (
     <EditorWindow id="stack" title={t("title")}>
-      <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-sm leading-8 md:whitespace-pre md:text-base">
+      <pre className="overflow-x-auto font-mono text-sm leading-8 whitespace-pre-wrap md:text-base md:whitespace-pre">
         <code>
           <span className="text-muted">{`// ${t("lead")}`}</span>
           {"\n"}

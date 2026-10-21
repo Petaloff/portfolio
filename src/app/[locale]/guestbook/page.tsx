@@ -67,7 +67,7 @@ export default async function GuestbookPage() {
   ].filter(Boolean);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-24 pt-36 md:px-8">
+    <div className="mx-auto max-w-2xl px-4 pt-36 pb-24 md:px-8">
       <Reveal>
         <h1 className="text-5xl font-semibold tracking-tighter md:text-7xl">{t("title")}</h1>
         <p className="mt-6 text-muted">{t("lead")}</p>

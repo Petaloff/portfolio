@@ -15,7 +15,11 @@ const subscribeNoop = () => () => {};
 // Vercel Analytics is cookie-free and always on. PostHog only loads after consent.
 export function Analytics() {
   const consent = useConsent();
-  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
+  const mounted = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     if (!POSTHOG_KEY) return;

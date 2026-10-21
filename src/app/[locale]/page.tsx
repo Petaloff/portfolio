@@ -19,7 +19,11 @@ export default async function Home() {
       <JsonLd
         data={{
           "@graph": [
-            personSchema(t("hero.kicker"), t("meta.description"), stack.flatMap((g) => g.items)),
+            personSchema(
+              t("hero.kicker"),
+              t("meta.description"),
+              stack.flatMap((g) => g.items),
+            ),
             {
               "@type": "WebSite",
               "@id": absolute("/#website"),

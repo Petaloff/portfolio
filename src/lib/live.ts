@@ -38,10 +38,7 @@ export async function getLiveStats(): Promise<LiveStats> {
 
   const [user, repos, mods] = await Promise.all([
     getJson<GithubUser>(`https://api.github.com/users/${site.github}`, githubHeaders),
-    getJson<GithubRepo[]>(
-      `https://api.github.com/users/${site.github}/repos?per_page=100`,
-      githubHeaders,
-    ),
+    getJson<GithubRepo[]>(`https://api.github.com/users/${site.github}/repos?per_page=100`, githubHeaders),
     getJson<ModrinthProject[]>(`https://api.modrinth.com/v2/user/${site.modrinth}/projects`),
   ]);
 
@@ -52,9 +49,7 @@ export async function getLiveStats(): Promise<LiveStats> {
     followers: user?.followers ?? null,
     stars: ownRepos ? ownRepos.reduce((sum, r) => sum + r.stargazers_count, 0) : null,
     downloads: mods ? mods.reduce((sum, m) => sum + m.downloads, 0) : null,
-    repoStars: Object.fromEntries(
-      (ownRepos ?? []).map((r) => [r.full_name.toLowerCase(), r.stargazers_count]),
-    ),
+    repoStars: Object.fromEntries((ownRepos ?? []).map((r) => [r.full_name.toLowerCase(), r.stargazers_count])),
     modDownloads: Object.fromEntries((mods ?? []).map((m) => [m.slug, m.downloads])),
   };
 }

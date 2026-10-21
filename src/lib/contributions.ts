@@ -40,14 +40,11 @@ async function fromGraphQL(token: string): Promise<Contributions | null> {
     signal: AbortSignal.timeout(5000),
   });
   if (!res.ok) return null;
-  const calendar = ((await res.json()) as GraphResponse).data?.user?.contributionsCollection
-    .contributionCalendar;
+  const calendar = ((await res.json()) as GraphResponse).data?.user?.contributionsCollection.contributionCalendar;
   if (!calendar) return null;
   return {
     total: calendar.totalContributions,
-    days: calendar.weeks.flatMap((w) =>
-      w.contributionDays.map((d) => ({ date: d.date, count: d.contributionCount })),
-    ),
+    days: calendar.weeks.flatMap((w) => w.contributionDays.map((d) => ({ date: d.date, count: d.contributionCount }))),
   };
 }
 

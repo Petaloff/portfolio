@@ -54,7 +54,7 @@ export function EditorWindow({
                   <span
                     key={f.id}
                     aria-current="page"
-                    className="flex shrink-0 items-center gap-2 border-x border-line border-t-2 border-t-accent bg-surface px-4 text-fg"
+                    className="flex shrink-0 items-center gap-2 border-x border-t-2 border-line border-t-accent bg-surface px-4 text-fg"
                   >
                     {f.name}
                   </span>
@@ -81,7 +81,7 @@ export function EditorWindow({
           <div className="relative">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-y-0 left-0 hidden w-12 select-none overflow-hidden border-r border-line/60 pt-6 text-right font-mono text-[11px] leading-7 text-muted/50 md:block"
+              className="pointer-events-none absolute inset-y-0 left-0 hidden w-12 overflow-hidden border-r border-line/60 pt-6 text-right font-mono text-[11px] leading-7 text-muted/50 select-none md:block"
             >
               {Array.from({ length: 80 }, (_, i) => (
                 <div key={i} className="pr-3">
@@ -89,7 +89,7 @@ export function EditorWindow({
                 </div>
               ))}
             </div>
-            <div className="p-5 md:py-8 md:pl-20 md:pr-10">
+            <div className="p-5 md:py-8 md:pr-10 md:pl-20">
               <h2 className="mb-8 font-mono text-sm text-muted">
                 <span className="text-accent">{commentPrefix[id]}</span> {title}
               </h2>
