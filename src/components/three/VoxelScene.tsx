@@ -11,7 +11,7 @@ import { buildName, COUNT, fromModel, SIZE, type Formation } from "./formations"
 import { MoodLights } from "./MoodLights";
 import { Head } from "./Head";
 import { Thought } from "./Thought";
-import { cloudBob, headPhase, headSide, smoothstep, spring, thoughtPose } from "./pose";
+import { cloudBob, headPhase, headSide, headState, smoothstep, spring, thoughtPose } from "./pose";
 import { models } from "./voxelArt";
 
 // Narrow windows get a coarser grid: fewer, bigger cubes stay crisp at small
@@ -146,7 +146,9 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
 
     // Banner across the top of the hero, then a figure beside the content
     const scrolled = scrollY / innerHeight;
-    const shape: Shape = scrolled < 0.6 ? "name" : (sections[sceneState.section] ?? "name");
+    // While the head thinks, the figure waits (shrunk away) until its cloud is up
+    const waiting = headPhase(sceneState.section) === "thinking" && headState.cloud < 0.95;
+    const shape: Shape = scrolled < 0.6 ? "name" : waiting ? "head" : (sections[sceneState.section] ?? "name");
     const layout = getShape(shape);
     if (shown.current.formation !== layout) {
       const rgb = layout.colors;

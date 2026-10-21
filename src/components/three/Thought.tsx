@@ -82,6 +82,7 @@ export function Thought() {
       ? target
       : progress.current + Math.sign(gap) * Math.min(Math.abs(gap), dt * (gap > 0 ? 1.6 : 3.5)));
 
+    headState.cloud = p;
     const pose = thoughtPose(viewport, size, facing);
     const { cloud: box, head } = pose;
     // Dimmed behind the windows when there is no margin to stand in, like the figures
