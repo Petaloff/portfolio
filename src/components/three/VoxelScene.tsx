@@ -11,7 +11,7 @@ import { buildName, COUNT, fromModel, SIZE, type Formation } from "./formations"
 import { MoodLights } from "./MoodLights";
 import { Head } from "./Head";
 import { Thought } from "./Thought";
-import { cloudBob, headPhase, headSide, headState, smoothstep, spring, thoughtPose } from "./pose";
+import { cloudBob, headPhase, headSide, headState, introPose, smoothstep, spring, thoughtPose } from "./pose";
 import { models } from "./voxelArt";
 
 // Narrow windows get a coarser grid: fewer, bigger cubes stay crisp at small
@@ -29,12 +29,18 @@ const sections: Record<string, Shape> = {
   blog: "hash",
   contact: "at",
 };
-type Shape = "name" | "head" | "code" | "city" | "braces" | "pickaxe" | "hash" | "at";
+type Shape = "name" | "scatter" | "head" | "code" | "city" | "braces" | "pickaxe" | "hash" | "at";
 
 function buildShape(shape: Shape, name: string, budget: number): Formation {
   switch (shape) {
     case "name":
       return buildName(name, budget);
+    case "scatter": {
+      // The name blown apart once the intro is over: every cube flies outwards and shrinks away
+      const f = buildName(name, budget);
+      const positions = f.positions.map((v, i) => v * 2.5 + Math.sin(i * 78.233) * 6);
+      return { ...f, positions, scales: new Float32Array(COUNT) };
+    }
     case "head":
       // The cubes fold into the head's outline and shrink away: the Head takes over there
       return { ...fromModel(models.head, budget), scales: new Float32Array(COUNT) };
@@ -104,12 +110,12 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
   const speeds = useMemo(() => Float32Array.from({ length: COUNT }, (_, i) => 1.6 + ((i * 37) % 100) / 45), []);
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
-  // Frames are drawn on demand: scrolling, the cursor near the top, a section
+  // Frames are drawn on demand: scrolling, the cursor over the intro, a section
   // change or the easter egg wake the scene, and it keeps drawing until it settles
   useEffect(() => {
     const onScroll = () => invalidate();
     const onMove = () => {
-      if (scrollY < innerHeight * 0.1) invalidate();
+      if (sceneState.intro) invalidate();
     };
     addEventListener("scroll", onScroll, { passive: true });
     addEventListener("pointermove", onMove, { passive: true });
@@ -144,11 +150,19 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     const dt = Math.min(timer.getDelta(), 1 / 30);
     const t = timer.getElapsed();
 
-    // Banner across the top of the hero, then a figure beside the content
+    // The name in the middle of the intro; past it the name bursts, and further
+    // down the cubes make a figure beside the content
     const scrolled = scrollY / innerHeight;
+    const { intro } = sceneState;
     // While the head thinks, the figure waits (shrunk away) until its cloud is up
     const waiting = headPhase(sceneState.section) === "thinking" && headState.cloud < 0.95;
-    const shape: Shape = scrolled < 0.6 ? "name" : waiting ? "head" : (sections[sceneState.section] ?? "name");
+    const shape: Shape = intro
+      ? "name"
+      : scrolled < 0.6
+        ? "scatter"
+        : waiting
+          ? "head"
+          : (sections[sceneState.section] ?? "scatter");
     const layout = getShape(shape);
     if (shown.current.formation !== layout) {
       const rgb = layout.colors;
@@ -169,7 +183,7 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     const pos = current.current.positions;
     const scl = current.current.scales;
 
-    const atTop = scrolled < 0.05;
+    const atTop = intro;
     const f = follow.current;
     const ease = 1 - Math.exp(-dt * 6);
     const fade = 1 - Math.exp(-dt * 4);
@@ -178,7 +192,7 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     f.tilt += ((atTop && !calm ? 1 : 0) - f.tilt) * fade;
     f.lens += ((atTop && !calm && !coarse ? 1 : 0) - f.lens) * fade;
 
-    // 0 is the hero banner, 1 the side figure
+    // 0 is the name in the middle, 1 the side figure
     const side = smoothstep(0.35, 1, scrolled);
     // Off the hero the figure is what the head is thinking about, inside its cloud
     // The figure stays in its cloud while the cloud bursts, then follows the head
@@ -186,7 +200,8 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     const { roomy, cloud, inner } = thoughtPose(viewport, size, facing);
     const bob =
       !calm && headPhase(sceneState.section) === "thinking" ? cloudBob(performance.now() / 1000, cloud.height) : 0;
-    const fitHero = Math.min(1, (viewport.width * 0.8) / layout.width);
+    const centre = introPose(viewport).name;
+    const fitHero = Math.min(1, centre.width / layout.width, centre.height / layout.height);
     // The figure turns, so solid shapes need room for their diagonal
     const fitSide = Math.min(inner.width / Math.hypot(layout.width, layout.depth), inner.height / layout.height);
     const lambda = calm ? 60 : 6;
@@ -195,7 +210,7 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     // On springs, so the figure glides after the head when it swaps margins
     const mo = motion.current;
     const tx = cloud.x * side;
-    const ty = THREE.MathUtils.lerp(viewport.height * 0.26, cloud.y + bob, side);
+    const ty = THREE.MathUtils.lerp(centre.y, cloud.y + bob, side);
     // The first frame starts in place rather than flying in from the centre
     if (calm || !ready.current) {
       Object.assign(mo.x, { x: tx, v: 0 });
@@ -228,8 +243,9 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     let moving = 0;
     for (let i = 0; i < COUNT; i++) {
       // Base position eases into the current shape (assembly on load, morphs on scroll)
-      // Waiting for its cloud, the figure shrinks away quickly rather than drifting
-      const k = calm ? 1 : 1 - Math.exp(-dt * speeds[i] * (waiting ? 4 : 1));
+      // Waiting for its cloud, the figure shrinks away quickly rather than drifting,
+      // and the name bursts rather than drifts apart
+      const k = calm ? 1 : 1 - Math.exp(-dt * speeds[i] * (waiting ? 4 : shape === "scatter" ? 2 : 1));
       const j = i * 3;
       const tx = layout.positions[j];
       const ty = layout.positions[j + 1];

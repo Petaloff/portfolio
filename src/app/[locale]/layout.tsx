@@ -15,6 +15,7 @@ import { AmbientVoxels } from "@/components/three/AmbientVoxels";
 import { Background } from "@/components/three/Background";
 import { Overlay } from "@/components/three/Overlay";
 import { routing, type Locale } from "@/i18n/routing";
+import { introScript } from "@/lib/introScript";
 import { mcUsername } from "@/lib/minecraft";
 import { pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -69,8 +70,10 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
   if (!hasLocale(routing.locales, locale)) notFound();
 
   return (
-    <html lang={locale} className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    // data-intro is set before hydration by introScript
+    <html lang={locale} className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
       <body className="min-h-dvh font-sans">
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
         <NextIntlClientProvider>
           <SmoothScroll />
           <AmbientVoxels />

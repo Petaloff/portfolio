@@ -1,3 +1,5 @@
+import { sceneState } from "@/lib/scene";
+
 // The page content column (max-w-6xl); side figures sit in the margin beside it
 const CONTENT_WIDTH = 1152;
 
@@ -66,12 +68,23 @@ export function thoughtPose(viewport: { width: number; height: number }, size: {
   };
 }
 
+// The intro: the name a little above the middle of the screen, the head under it.
+// Centres and sizes in world units
+export function introPose(viewport: { width: number; height: number }) {
+  const vh = viewport.height;
+  return {
+    name: { y: vh * 0.16, width: viewport.width * 0.8, height: vh * 0.26 },
+    head: { y: -vh * 0.19, height: vh * 0.28 },
+  };
+}
+
 // The home page sections in order; the head swaps margins from one to the
-// next, counting only those on the page (activity needs GitHub data)
+// next, counting only those on the page (activity needs GitHub data). It
+// stands on the right beside the hero, so "about me" starts on the left
 const ORDER = ["about", "projects", "activity", "stack", "minecraft", "blog", "contact"];
 export function headSide(section: string) {
   const shown = ORDER.filter((id) => id === section || document.getElementById(id));
-  return Math.max(0, shown.indexOf(section)) % 2 === 0 ? 1 : -1;
+  return Math.max(0, shown.indexOf(section)) % 2 === 0 ? -1 : 1;
 }
 
 // Shared between the head, its cloud and the figure in it: the cloud only pops
@@ -83,9 +96,10 @@ export const headState = { flying: false, cloud: 0, side: 1 };
 // The cloud floats gently up and down, and the figure in it with it
 export const cloudBob = (t: number, height: number) => Math.sin(t * 1.3) * height * 0.06;
 
-// What the margin shows: nothing in the hero, the head beside "about me",
-// then the thinking head for the rest of the page
-export function headPhase(section: string): "hero" | "about" | "thinking" {
+// Where the head is: under the name in the intro, beside the hero text, beside
+// "about me", then thinking for the rest of the page
+export function headPhase(section: string): "intro" | "hero" | "about" | "thinking" {
+  if (sceneState.intro) return "intro";
   if (scrollY / innerHeight < 0.6 || section === "") return "hero";
   return section === "about" ? "about" : "thinking";
 }

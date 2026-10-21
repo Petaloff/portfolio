@@ -149,7 +149,9 @@ export function Thought() {
     t.instanceMatrix.needsUpdate = true;
     c.visible = t.visible = p > 0;
 
-    const el = target && p > 0.6 ? document.getElementById(section) : null;
+    // "About me" has no cloud: its window lights up once the head has landed beside it
+    const beside = headPhase(section) === "about" && !headState.flying;
+    const el = (target && p > 0.6) || beside ? document.getElementById(section) : null;
     if (el !== marked.current) {
       marked.current?.removeAttribute("data-thought");
       el?.setAttribute("data-thought", facing > 0 ? "right" : "left");

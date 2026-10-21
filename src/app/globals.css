@@ -29,6 +29,31 @@ html.lenis body {
   overflow: clip;
 }
 
+/* The home page intro (see lib/intro): the page is held still, the header and
+   the hero text wait for the first scroll. The gutter keeps the layout from
+   shifting when the scrollbar comes back */
+html[data-intro],
+html.lenis.lenis-stopped[data-intro] {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+[data-intro-fade] {
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s,
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s,
+    visibility 0s;
+}
+html[data-intro] [data-intro-fade] {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(2rem);
+  transition-duration: 0.4s, 0.4s, 0s;
+  transition-delay: 0s, 0s, 0.4s;
+}
+html[data-intro] header[data-intro-fade] {
+  transform: translateY(-100%);
+}
+
 body {
   background: var(--bg);
   color: var(--fg);

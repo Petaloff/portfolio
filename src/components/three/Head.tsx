@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { useCalm } from "@/lib/media";
 import { sceneState } from "@/lib/scene";
 import { fromModel, SIZE } from "./formations";
-import { cloudBob, fitSide, headPhase, headSide, headState, spring, thoughtPose } from "./pose";
+import { cloudBob, fitSide, headPhase, headSide, headState, introPose, spring, thoughtPose } from "./pose";
 import { headFromSkin, models, type Model } from "./voxelArt";
 
 const N = models.head.voxels.length;
@@ -18,9 +18,9 @@ function readColors() {
   };
 }
 
-// The Minecraft head on the right of the page. It looks at the cursor, stands
-// beside "about me" and stays for the rest of the page, thinking about each
-// section (see Thought). Hidden in the hero, where the name is
+// The Minecraft head of the home page. It looks at the cursor, sits under the
+// name in the intro, then stands beside the hero text and "about me" and stays
+// for the rest of the page, thinking about each section (see Thought)
 export function Head({ skin }: { skin?: string }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
@@ -34,7 +34,6 @@ export function Head({ skin }: { skin?: string }) {
   const dummy = useMemo(() => new THREE.Object3D(), []);
   // Cubes start scattered and fly together the first time the head shows up
   const current = useRef<Float32Array | null>(null);
-  const visible = useRef(false);
   // Position and size move on springs so the flights between margins are smooth
   const motion = useRef({ x: { x: 0, v: 0 }, y: { x: 0, v: 0 }, scale: { x: 0, v: 0 } });
 
@@ -77,11 +76,9 @@ export function Head({ skin }: { skin?: string }) {
     invalidate();
   }, [layout, colors, invalidate]);
 
-  // The cursor only redraws the scene while the head is there to follow it
+  // The head follows the cursor wherever it is
   useEffect(() => {
-    const onMove = () => {
-      if (visible.current) invalidate();
-    };
+    const onMove = () => invalidate();
     addEventListener("pointermove", onMove, { passive: true });
     return () => removeEventListener("pointermove", onMove);
   }, [invalidate]);
@@ -95,32 +92,34 @@ export function Head({ skin }: { skin?: string }) {
     const dt = Math.min(timer.getDelta(), 1 / 30);
 
     const phase = headPhase(sceneState.section);
-    visible.current = phase !== "hero";
-
     const pose = thoughtPose(viewport, size, headSide(sceneState.section));
     let x = pose.x;
     let y = 0;
     let scale = fitSide(layout, pose.width, viewport.height, pose.roomy);
-    const opacity = pose.roomy ? 0.95 : 0.35;
-    if (phase === "thinking") {
+    let opacity = pose.roomy ? 0.95 : 0.35;
+    // The hero keeps a slot for it beside the text (see HeroFrame)
+    const slot = phase === "hero" ? document.getElementById("hero-head")?.getBoundingClientRect() : undefined;
+    if (phase === "intro") {
+      const intro = introPose(viewport);
+      x = 0;
+      y = intro.head.y;
+      scale = intro.head.height / layout.height;
+      opacity = 0.95;
+    } else if (slot?.width) {
+      const px = viewport.width / size.width;
+      x = (slot.left + slot.width / 2 - size.width / 2) * px;
+      y = (size.height / 2 - slot.top - slot.height / 2) * px;
+      // A little smaller than its slot, so it keeps clear of the text as it turns
+      const fit = slot.width * px * 0.8;
+      scale = Math.min(fit / Math.hypot(layout.width, layout.depth), fit / layout.height);
+      opacity = 0.95;
+    } else if (phase === "thinking") {
       // Sinks a little to make room for the thought cloud above
       x = pose.head.x;
       y = pose.head.y;
       scale = pose.head.width / Math.hypot(layout.width, layout.depth);
       // Bobs a beat behind its cloud
       if (!calm) y += cloudBob(performance.now() / 1000 - 0.6, pose.head.width);
-    }
-    // Slipping away into the hero, it stays where it was and shrinks; once
-    // gone it waits where it will next appear
-    if (!visible.current) {
-      const gone = motion.current.scale.x < 1e-3;
-      x = gone ? x : motion.current.x.x;
-      y = gone ? y : motion.current.y.x;
-      scale = 0;
-      if (gone) {
-        Object.assign(motion.current.x, { x, v: 0 });
-        Object.assign(motion.current.y, { x: y, v: 0 });
-      }
     }
 
     const mo = motion.current;
@@ -151,28 +150,23 @@ export function Head({ skin }: { skin?: string }) {
     g.rotation.y = THREE.MathUtils.damp(g.rotation.y, yaw, turn, dt);
     g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pitch, turn, dt);
 
-    if (visible.current || g.scale.x > 1e-3) {
-      current.current ??= calm
-        ? layout.positions.slice(0, N * 3)
-        : Float32Array.from({ length: N * 3 }, (_, i) => Math.sin(i * 12.9898) * 6);
-    }
-    const pos = current.current;
+    const pos = (current.current ??= calm
+      ? layout.positions.slice(0, N * 3)
+      : Float32Array.from({ length: N * 3 }, (_, i) => Math.sin(i * 12.9898) * 6));
     let moving = 0;
-    if (pos) {
-      for (let i = 0; i < N; i++) {
-        const k = calm ? 1 : 1 - Math.exp(-dt * (2 + ((i * 37) % 100) / 40));
-        for (let a = 0; a < 3; a++) {
-          const j = i * 3 + a;
-          const d = layout.positions[j] - pos[j];
-          moving = Math.max(moving, Math.abs(d));
-          pos[j] += d * k;
-        }
-        dummy.position.set(pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2]);
-        dummy.updateMatrix();
-        m.setMatrixAt(i, dummy.matrix);
+    for (let i = 0; i < N; i++) {
+      const k = calm ? 1 : 1 - Math.exp(-dt * (2 + ((i * 37) % 100) / 40));
+      for (let a = 0; a < 3; a++) {
+        const j = i * 3 + a;
+        const d = layout.positions[j] - pos[j];
+        moving = Math.max(moving, Math.abs(d));
+        pos[j] += d * k;
       }
-      m.instanceMatrix.needsUpdate = true;
+      dummy.position.set(pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2]);
+      dummy.updateMatrix();
+      m.setMatrixAt(i, dummy.matrix);
     }
+    m.instanceMatrix.needsUpdate = true;
 
     const settled =
       moving < 2e-3 &&

@@ -17,7 +17,7 @@ export async function Header() {
     { href: "/#contact", label: t("contact") },
   ];
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-line/60 bg-bg/70 backdrop-blur-md">
+    <header data-intro-fade className="fixed inset-x-0 top-0 z-40 border-b border-line/60 bg-bg/70 backdrop-blur-md">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4">
         {t("skip")}
       </a>

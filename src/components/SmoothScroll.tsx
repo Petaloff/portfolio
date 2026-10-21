@@ -7,17 +7,36 @@ import { useEffect } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+let lenis: Lenis | null = null;
+let held = false;
+
+// Holds the page still (the home page intro) or lets it scroll again
+export function holdScroll(hold: boolean) {
+  held = hold;
+  if (hold) lenis?.stop();
+  else lenis?.start();
+}
+
+// Glides the page to an element, the way an anchor link does; the visitor's
+// own scrolling cannot cut in until it lands
+export function glideTo(el: HTMLElement, duration: number) {
+  if (lenis) lenis.scrollTo(el, { offset: -72, duration, lock: true, force: true });
+  else scrollTo({ top: el.getBoundingClientRect().top + scrollY - 72 });
+}
+
 export function SmoothScroll() {
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const lenis = new Lenis({ anchors: { offset: -72 } });
-    lenis.on("scroll", ScrollTrigger.update);
-    const tick = (time: number) => lenis.raf(time * 1000);
+    const instance = (lenis = new Lenis({ anchors: { offset: -72 } }));
+    if (held) instance.stop();
+    instance.on("scroll", ScrollTrigger.update);
+    const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
     return () => {
       gsap.ticker.remove(tick);
-      lenis.destroy();
+      instance.destroy();
+      if (lenis === instance) lenis = null;
     };
   }, []);
   return null;

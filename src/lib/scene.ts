@@ -7,6 +7,8 @@ export const sceneState = {
   burstAt: -Infinity,
   // id of the home page section in the middle of the screen
   section: "",
+  // The home page intro is up: the name in the middle, the head under it (see intro.ts)
+  intro: false,
 };
 
 // The scenes render on demand, so anything that changes sceneState from outside
