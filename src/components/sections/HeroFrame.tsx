@@ -18,7 +18,7 @@ export function HeroFrame({ children }: { children: ReactNode }) {
   const compact = hydrated && mode === "lite";
   return (
     <section
-      className={`mx-auto flex min-h-dvh max-w-6xl flex-col justify-end px-4 pt-32 pb-16 md:px-8 md:pb-24 ${compact ? "md:min-h-0 md:pt-40" : ""}`}
+      className={`relative mx-auto flex min-h-dvh max-w-6xl flex-col justify-end px-4 pt-32 pb-16 md:px-8 md:pb-24 ${compact ? "md:min-h-0 md:pt-40" : ""}`}
     >
       {children}
     </section>
