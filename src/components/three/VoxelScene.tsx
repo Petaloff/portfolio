@@ -11,7 +11,7 @@ import { buildName, COUNT, fromModel, SIZE, type Formation } from "./formations"
 import { MoodLights } from "./MoodLights";
 import { Head } from "./Head";
 import { Thought } from "./Thought";
-import { cloudBob, headPhase, headSide, smoothstep, thoughtPose } from "./pose";
+import { cloudBob, headPhase, headSide, smoothstep, spring, thoughtPose } from "./pose";
 import { models } from "./voxelArt";
 
 // Narrow windows get a coarser grid: fewer, bigger cubes stay crisp at small
@@ -96,6 +96,7 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
   const current = useRef<{ positions: Float32Array; scales: Float32Array } | null>(null);
   // Smoothed pointer and how strongly the name reacts to it (fades out on scroll)
   const follow = useRef({ x: 0, y: 0, tilt: 0, lens: 0 });
+  const motion = useRef({ x: { x: 0, v: 0 }, y: { x: 0, v: 0 } });
   // Ripples spawned as the cursor moves across the name, in its local space
   const ripples = useRef<{ x: number; y: number; t0: number }[]>([]);
   const lastRipple = useRef({ x: 0, y: 0, t: 0 });
@@ -188,13 +189,17 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
     const lambda = calm ? 60 : 6;
     const scale = THREE.MathUtils.damp(g.scale.x, THREE.MathUtils.lerp(fitHero, fitSide, side), lambda, dt);
     g.scale.setScalar(scale);
-    g.position.x = THREE.MathUtils.damp(g.position.x, cloud.x * side, lambda, dt);
-    g.position.y = THREE.MathUtils.damp(
-      g.position.y,
-      THREE.MathUtils.lerp(viewport.height * 0.26, cloud.y + bob, side),
-      lambda,
-      dt,
-    );
+    // On springs, so the figure glides after the head when it swaps margins
+    const mo = motion.current;
+    const tx = cloud.x * side;
+    const ty = THREE.MathUtils.lerp(viewport.height * 0.26, cloud.y + bob, side);
+    // The first frame starts in place rather than flying in from the centre
+    if (calm || !ready.current) {
+      Object.assign(mo.x, { x: tx, v: 0 });
+      Object.assign(mo.y, { x: ty, v: 0 });
+    }
+    g.position.x = spring(mo.x, tx, 3.6, dt);
+    g.position.y = spring(mo.y, ty, 5, dt);
     // Turns with the scroll so the figure shows its depth, facing the content
     g.rotation.y = f.x * 0.12 * f.tilt - facing * side * (0.35 + Math.sin(scrollY * 0.0015) * 0.25);
     g.rotation.x = f.y * 0.08 * f.tilt + side * 0.12;
@@ -274,7 +279,10 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
       queueMicrotask(() => onReady?.());
     }
     // Keep drawing while anything is still in motion
-    const posing = Math.abs(g.scale.x - THREE.MathUtils.lerp(fitHero, fitSide, side)) > 1e-3;
+    const posing =
+      Math.abs(g.scale.x - THREE.MathUtils.lerp(fitHero, fitSide, side)) > 1e-3 ||
+      Math.abs(mo.x.v) + Math.abs(mo.y.v) > 1e-3 ||
+      Math.abs(mo.y.x - ty) > 1e-3;
     if (moving > 2e-3 || posing || f.tilt > 0.01 || live.length > 0 || blast > 0.01 || age < 4) invalidate();
   });
 

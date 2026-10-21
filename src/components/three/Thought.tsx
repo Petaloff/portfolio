@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { useCalm } from "@/lib/media";
 import { sceneState } from "@/lib/scene";
 import { fromModel, SIZE } from "./formations";
-import { CLOUD, cloudBob, headPhase, headSide, thoughtPose } from "./pose";
+import { CLOUD, cloudBob, headPhase, headSide, headState, thoughtPose } from "./pose";
 import { extrude } from "./voxelArt";
 
 const model = extrude(CLOUD, 2);
@@ -72,11 +72,11 @@ export function Thought() {
 
     // Swapping margins, the cloud bursts and only comes back once the head has landed
     const facing = headSide(section);
-    if (facing !== side.current.value) side.current = { value: facing, holdUntil: calm ? 0 : now + 1 };
+    if (facing !== side.current.value) side.current = { value: facing, holdUntil: calm ? 0 : now + 0.3 };
     // A new section makes the cloud wobble like jelly as the new figure forms
     if (section !== change.current.section) change.current = { section, at: now };
 
-    const target = thinking && now >= side.current.holdUntil ? 1 : 0;
+    const target = thinking && now >= side.current.holdUntil && !headState.flying ? 1 : 0;
     const gap = target - progress.current;
     const p = (progress.current = calm
       ? target
@@ -140,7 +140,7 @@ export function Thought() {
     c.visible = t.visible = p > 0;
 
     // Always on the move while it is up, unless motion is reduced
-    if (p !== target || (live && p > 0) || now < side.current.holdUntil) invalidate();
+    if (p !== target || (live && p > 0) || now < side.current.holdUntil || headState.flying) invalidate();
   });
 
   return (

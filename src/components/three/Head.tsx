@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { useCalm } from "@/lib/media";
 import { sceneState } from "@/lib/scene";
 import { fromModel, SIZE } from "./formations";
-import { cloudBob, fitSide, headPhase, headSide, thoughtPose } from "./pose";
+import { cloudBob, fitSide, headPhase, headSide, headState, spring, thoughtPose } from "./pose";
 import { headFromSkin, models, type Model } from "./voxelArt";
 
 const N = models.head.voxels.length;
@@ -35,6 +35,8 @@ export function Head({ skin }: { skin?: string }) {
   // Cubes start scattered and fly together the first time the head shows up
   const current = useRef<Float32Array | null>(null);
   const visible = useRef(false);
+  // Position and size move on springs so the flights between margins are smooth
+  const motion = useRef({ x: { x: 0, v: 0 }, y: { x: 0, v: 0 }, scale: { x: 0, v: 0 } });
 
   // Paint it with the skin once that has loaded; until then it is the plain head
   useEffect(() => {
@@ -108,25 +110,35 @@ export function Head({ skin }: { skin?: string }) {
       // Bobs a beat behind its cloud
       if (!calm) y += cloudBob(performance.now() / 1000 - 0.6, pose.head.width);
     }
-    // Slipping away into the hero, it stays where it was and shrinks
+    // Slipping away into the hero, it stays where it was and shrinks; once
+    // gone it waits where it will next appear
     if (!visible.current) {
-      x = g.position.x;
-      y = g.position.y;
+      const gone = motion.current.scale.x < 1e-3;
+      x = gone ? x : motion.current.x.x;
+      y = gone ? y : motion.current.y.x;
       scale = 0;
+      if (gone) {
+        Object.assign(motion.current.x, { x, v: 0 });
+        Object.assign(motion.current.y, { x: y, v: 0 });
+      }
     }
 
-    const lambda = calm ? 60 : 5;
-    g.position.x = THREE.MathUtils.damp(g.position.x, x, lambda, dt);
+    const mo = motion.current;
+    if (calm) {
+      Object.assign(mo.x, { x, v: 0 });
+      Object.assign(mo.y, { x: y, v: 0 });
+      Object.assign(mo.scale, { x: scale, v: 0 });
+    }
+    spring(mo.x, x, 3.2, dt);
+    spring(mo.y, y, 4, dt);
+    spring(mo.scale, scale, 4.5, dt);
     // Swapping margins it leaps across the page in an arc, leaning into the flight
-    const flight = x - g.position.x;
-    g.position.y = THREE.MathUtils.damp(g.position.y, y + (calm ? 0 : Math.abs(flight) * 0.3), lambda, dt);
-    g.rotation.z = THREE.MathUtils.damp(
-      g.rotation.z,
-      calm ? 0 : THREE.MathUtils.clamp(-flight * 0.12, -0.5, 0.5),
-      6,
-      dt,
-    );
-    g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, scale, lambda, dt));
+    const speed = mo.x.v;
+    headState.flying = Math.abs(x - mo.x.x) > pose.head.width * 0.3 || Math.abs(speed) > pose.head.width;
+    g.position.set(mo.x.x, mo.y.x + Math.abs(speed) * 0.12, 0);
+    g.rotation.z = THREE.MathUtils.clamp(-speed * 0.05, -0.35, 0.35);
+    g.scale.setScalar(Math.max(0, mo.scale.x));
+    const lambda = calm ? 60 : 5;
     mat.opacity = THREE.MathUtils.damp(mat.opacity, opacity, lambda, dt);
 
     // Turn to the cursor: its offset from the head on screen, in screen-height units
@@ -167,6 +179,7 @@ export function Head({ skin }: { skin?: string }) {
       Math.abs(g.position.x - x) < 1e-3 &&
       Math.abs(g.position.y - y) < 1e-3 &&
       Math.abs(g.scale.x - scale) < 1e-4 &&
+      Math.abs(motion.current.x.v) + Math.abs(motion.current.y.v) + Math.abs(motion.current.scale.v) < 1e-3 &&
       Math.abs(g.rotation.y - yaw) < 1e-3 &&
       Math.abs(g.rotation.x - pitch) < 1e-3 &&
       Math.abs(mat.opacity - opacity) < 1e-3;

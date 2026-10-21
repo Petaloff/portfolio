@@ -74,6 +74,9 @@ export function headSide(section: string) {
   return Math.max(0, shown.indexOf(section)) % 2 === 0 ? 1 : -1;
 }
 
+// Shared between the head and its cloud: the cloud only pops up once the head has landed
+export const headState = { flying: false };
+
 // The cloud floats gently up and down, and the figure in it with it
 export const cloudBob = (t: number, height: number) => Math.sin(t * 1.3) * height * 0.06;
 
@@ -82,4 +85,17 @@ export const cloudBob = (t: number, height: number) => Math.sin(t * 1.3) * heigh
 export function headPhase(section: string): "hero" | "about" | "thinking" {
   if (scrollY / innerHeight < 0.6 || section === "") return "hero";
   return section === "about" ? "about" : "thinking";
+}
+
+// A critically damped spring: unlike plain damping it starts from rest and
+// keeps its velocity through a change of target, so flights ease in and out
+// without jerks. omega sets the speed (settles in about 5 / omega seconds)
+export type Spring = { x: number; v: number };
+export function spring(s: Spring, target: number, omega: number, dt: number) {
+  const d = s.x - target;
+  const e = Math.exp(-omega * dt);
+  const k = s.v + omega * d;
+  s.x = target + (d + k * dt) * e;
+  s.v = (s.v - omega * k * dt) * e;
+  return s.x;
 }
