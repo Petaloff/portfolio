@@ -14,6 +14,8 @@ const errors: Record<NonNullable<NonNullable<AdminState>["error"]>, string> = {
   storage: "Redis не подключён, сохранять некуда",
   input: "Что-то не так с данными формы",
   icu: "Сломан синтаксис ICU в ключах",
+  login: "Такого пользователя GitHub нет",
+  github: "GitHub не ответил, попробуй ещё раз",
   slug: "Slug: латиница, цифры и дефисы, до 48 символов",
   title: "Нужно название, и не слишком длинное",
   summary: "Нужно описание на обоих языках",

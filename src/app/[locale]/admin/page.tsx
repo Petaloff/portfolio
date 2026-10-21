@@ -6,6 +6,7 @@ import { getSession, authEnabled, authProviders } from "@/auth";
 import { AdminPanel } from "@/components/admin/AdminPanel";
 import { GuestbookAdmin } from "@/components/admin/GuestbookAdmin";
 import { LegalEditor } from "@/components/admin/LegalEditor";
+import { MaintenanceEditor } from "@/components/admin/MaintenanceEditor";
 import { MessagesEditor } from "@/components/admin/MessagesEditor";
 import { PostsEditor } from "@/components/admin/PostsEditor";
 import { ProjectsEditor } from "@/components/admin/ProjectsEditor";
@@ -15,6 +16,7 @@ import { defaultMessages, getLegal, getMessageOverrides, getProjectList, getStor
 import { getEditablePosts } from "@/lib/content";
 import { getEntries } from "@/lib/guestbook";
 import { LEGAL_DOCS } from "@/lib/legal";
+import { getMaintenance } from "@/lib/maintenance";
 import { storageEnabled } from "@/lib/redis";
 import { adminLogin, adminLogout } from "./actions";
 
@@ -55,7 +57,7 @@ async function Admin() {
   // Signed in as someone else: the page simply does not exist for them
   if (!session.user.owner) notFound();
 
-  const [projects, posts, stored, entries, messages, legal] = await Promise.all([
+  const [projects, posts, stored, entries, messages, legal, maintenance] = await Promise.all([
     getProjectList(),
     getEditablePosts(),
     getStoredPosts(),
@@ -70,6 +72,7 @@ async function Admin() {
     Promise.all(
       LEGAL_DOCS.flatMap((doc) => routing.locales.map(async (l) => ({ doc, locale: l, text: await getLegal(doc, l) }))),
     ),
+    getMaintenance({ fresh: true }),
   ]);
   const giscus = process.env.NEXT_PUBLIC_GISCUS_REPO;
 
@@ -110,6 +113,12 @@ async function Admin() {
             label: "Гостевая",
             count: entries.length,
             content: <GuestbookAdmin entries={entries} locale={locale} />,
+          },
+          {
+            id: "maintenance",
+            label: maintenance.enabled ? "Техработы ●" : "Техработы",
+            count: maintenance.allow.length,
+            content: <MaintenanceEditor config={maintenance} locale={locale} />,
           },
           {
             id: "comments",

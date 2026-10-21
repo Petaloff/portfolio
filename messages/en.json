@@ -144,5 +144,13 @@
       "rate": "Give it a minute before the next one",
       "auth": "Sign in first"
     }
+  },
+  "maintenance": {
+    "title": "Down for maintenance",
+    "lead": "I'm tuning a few things and the site will be back soon. Check in a little later.",
+    "enter": "Go to the site",
+    "signIn": "I'm with the crew, sign in with GitHub",
+    "signedIn": "You're signed in as {name}, but this account has no access to the site.",
+    "signOut": "Sign out"
   }
 }

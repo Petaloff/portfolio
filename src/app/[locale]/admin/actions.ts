@@ -1,10 +1,11 @@
 "use server";
 
-import { revalidatePath, updateTag } from "next/cache";
+import { refresh as refreshRouter, revalidatePath, updateTag } from "next/cache";
 import { signIn, signOut } from "@/auth";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { requireOwner } from "@/lib/admin/guard";
+import { addUser, parseLogin } from "@/lib/admin/maintenance";
 import { diffOverrides, flatten, invalidMessages } from "@/lib/admin/messages";
 import { parsePost, upsertPost, type PostError } from "@/lib/admin/posts";
 import { parseProject, upsertProject, type ProjectError } from "@/lib/admin/projects";
@@ -22,11 +23,12 @@ import {
 import { getPostFileSlugs } from "@/lib/content";
 import { clearEntries, removeEntry } from "@/lib/guestbook";
 import { LEGAL_DOCS, type LegalDoc } from "@/lib/legal";
+import { getMaintenance, saveMaintenance } from "@/lib/maintenance";
 import { storageEnabled } from "@/lib/redis";
 
 export type AdminState = {
   ok?: true;
-  error?: ProjectError | PostError | "storage" | "icu" | "input";
+  error?: ProjectError | PostError | "storage" | "icu" | "input" | "login" | "github";
   keys?: string[];
 } | null;
 
@@ -157,5 +159,41 @@ export async function clearGuestbook(): Promise<AdminState> {
   if (blocked) return blocked;
   await clearEntries();
   refresh("guestbook");
+  return { ok: true };
+}
+
+// The proxy reads the switch on every request, nothing prerendered needs to change
+export async function setMaintenance(enabled: boolean): Promise<AdminState> {
+  const blocked = await guard();
+  if (blocked) return blocked;
+  await saveMaintenance({ ...(await getMaintenance({ fresh: true })), enabled });
+  refreshRouter();
+  return { ok: true };
+}
+
+// The login is turned into the numeric GitHub id here, which is what the check compares
+export async function addMaintenanceUser(_: AdminState, form: FormData): Promise<AdminState> {
+  const blocked = await guard();
+  if (blocked) return blocked;
+  const login = parseLogin(form.get("login"));
+  if (!login) return { error: "login" };
+  const res = await fetch(`https://api.github.com/users/${login}`, {
+    headers: process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {},
+    cache: "no-store",
+  }).catch(() => null);
+  if (!res?.ok) return { error: res?.status === 404 ? "login" : "github" };
+  const user = (await res.json()) as { id: number; login: string };
+  const config = await getMaintenance({ fresh: true });
+  await saveMaintenance({ ...config, allow: addUser(config.allow, { id: String(user.id), login: user.login }) });
+  refreshRouter();
+  return { ok: true };
+}
+
+export async function removeMaintenanceUser(id: string): Promise<AdminState> {
+  const blocked = await guard();
+  if (blocked) return blocked;
+  const config = await getMaintenance({ fresh: true });
+  await saveMaintenance({ ...config, allow: config.allow.filter((u) => u.id !== id) });
+  refreshRouter();
   return { ok: true };
 }
