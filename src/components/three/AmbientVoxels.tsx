@@ -67,14 +67,15 @@ type Cluster = {
   desktopOnly?: boolean;
 };
 
-// The top right is left clear for the hero cluster on the home page
+// Clusters keep to the edges of the screen so they never sit behind the text
+// column; the hero has its own cluster beside the text
 const clusters: Cluster[] = [
   { shape: "stair", left: "3%", top: "12%", width: 190, opacity: 0.11, dur: 26, shift: -90 },
   { shape: "tower", left: "-3%", top: "52%", width: 130, opacity: 0.09, dur: 31, shift: -150 },
   {
     shape: "plateau",
-    left: "20%",
-    top: "70%",
+    left: "12%",
+    top: "86%",
     width: 250,
     opacity: 0.08,
     dur: 34,
@@ -82,20 +83,20 @@ const clusters: Cluster[] = [
     accent: [1, 1, 1],
     desktopOnly: true,
   },
-  { shape: "trio", left: "38%", top: "6%", width: 90, opacity: 0.06, dur: 22, shift: -40, desktopOnly: true },
-  { shape: "corner", left: "44%", top: "38%", width: 120, opacity: 0.05, dur: 29, shift: -120, desktopOnly: true },
+  { shape: "trio", left: "48%", top: "93%", width: 90, opacity: 0.06, dur: 22, shift: -40, desktopOnly: true },
+  { shape: "corner", left: "93%", top: "22%", width: 120, opacity: 0.05, dur: 29, shift: -120, desktopOnly: true },
   {
     shape: "plateau",
-    left: "76%",
-    top: "72%",
+    left: "80%",
+    top: "86%",
     width: 210,
     opacity: 0.1,
     dur: 28,
     shift: -110,
     accent: [2, 0, 1],
   },
-  { shape: "trio", left: "64%", top: "90%", width: 110, opacity: 0.07, dur: 24, shift: -70, desktopOnly: true },
-  { shape: "corner", left: "88%", top: "48%", width: 100, opacity: 0.06, dur: 33, shift: -50, desktopOnly: true },
+  { shape: "trio", left: "66%", top: "95%", width: 110, opacity: 0.07, dur: 24, shift: -70, desktopOnly: true },
+  { shape: "corner", left: "91%", top: "56%", width: 100, opacity: 0.06, dur: 33, shift: -50, desktopOnly: true },
 ];
 
 const SIZE = 28;
