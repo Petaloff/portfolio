@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { useCalm } from "@/lib/media";
 import { sceneState } from "@/lib/scene";
 import { fromModel, SIZE } from "./formations";
-import { fitSide, headPhase, thoughtPose } from "./pose";
+import { cloudBob, fitSide, headPhase, headSide, thoughtPose } from "./pose";
 import { headFromSkin, models, type Model } from "./voxelArt";
 
 const N = models.head.voxels.length;
@@ -95,7 +95,7 @@ export function Head({ skin }: { skin?: string }) {
     const phase = headPhase(sceneState.section);
     visible.current = phase !== "hero";
 
-    const pose = thoughtPose(viewport, size);
+    const pose = thoughtPose(viewport, size, headSide(sceneState.section));
     let x = pose.x;
     let y = 0;
     let scale = fitSide(layout, pose.width, viewport.height, pose.roomy);
@@ -105,6 +105,8 @@ export function Head({ skin }: { skin?: string }) {
       x = pose.head.x;
       y = pose.head.y;
       scale = pose.head.width / Math.hypot(layout.width, layout.depth);
+      // Bobs a beat behind its cloud
+      if (!calm) y += cloudBob(performance.now() / 1000 - 0.6, pose.head.width);
     }
     // Slipping away into the hero, it stays where it was and shrinks
     if (!visible.current) {
@@ -115,7 +117,15 @@ export function Head({ skin }: { skin?: string }) {
 
     const lambda = calm ? 60 : 5;
     g.position.x = THREE.MathUtils.damp(g.position.x, x, lambda, dt);
-    g.position.y = THREE.MathUtils.damp(g.position.y, y, lambda, dt);
+    // Swapping margins it leaps across the page in an arc, leaning into the flight
+    const flight = x - g.position.x;
+    g.position.y = THREE.MathUtils.damp(g.position.y, y + (calm ? 0 : Math.abs(flight) * 0.3), lambda, dt);
+    g.rotation.z = THREE.MathUtils.damp(
+      g.rotation.z,
+      calm ? 0 : THREE.MathUtils.clamp(-flight * 0.12, -0.5, 0.5),
+      6,
+      dt,
+    );
     g.scale.setScalar(THREE.MathUtils.damp(g.scale.x, scale, lambda, dt));
     mat.opacity = THREE.MathUtils.damp(mat.opacity, opacity, lambda, dt);
 

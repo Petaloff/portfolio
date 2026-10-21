@@ -48,22 +48,36 @@ export const CLOUD = [
 const CLOUD_ASPECT = CLOUD.length / CLOUD[0].length;
 
 // Below the "about me" section the head sinks a little and thinks: a cloud
-// above it holds the current section's figure. Sizes and centres in world units
-export function thoughtPose(viewport: { width: number; height: number }, size: { width: number }) {
-  const side = sidePose(viewport, size);
+// above it holds the current section's figure. side is 1 for the right margin
+// and -1 for the left one. Sizes and centres in world units
+export function thoughtPose(viewport: { width: number; height: number }, size: { width: number }, side = 1) {
+  const slot = sidePose(viewport, size);
   const vh = viewport.height;
-  const width = Math.min(side.width, vh * 0.5);
+  const width = Math.min(slot.width, vh * 0.5);
   const height = width * CLOUD_ASPECT;
+  const x = slot.x * side;
   return {
-    ...side,
-    cloud: { x: side.x, y: vh * 0.14, width, height },
+    ...slot,
+    x,
+    cloud: { x, y: vh * 0.14, width, height },
     // Room for the figure inside the cloud, clear of its bumpy edge
     inner: { width: width * 0.62, height: height * 0.58 },
-    head: { x: side.x + width * 0.12, y: -vh * 0.22, width: Math.min(side.width * 0.55, vh * 0.26) },
+    head: { x: x + width * 0.12 * side, y: -vh * 0.22, width: Math.min(slot.width * 0.55, vh * 0.26) },
   };
 }
 
-// What the right side shows: nothing in the hero, the head beside "about me",
+// The home page sections in order; the head swaps margins from one to the
+// next, counting only those on the page (activity needs GitHub data)
+const ORDER = ["about", "projects", "activity", "stack", "minecraft", "blog", "contact"];
+export function headSide(section: string) {
+  const shown = ORDER.filter((id) => id === section || document.getElementById(id));
+  return Math.max(0, shown.indexOf(section)) % 2 === 0 ? 1 : -1;
+}
+
+// The cloud floats gently up and down, and the figure in it with it
+export const cloudBob = (t: number, height: number) => Math.sin(t * 1.3) * height * 0.06;
+
+// What the margin shows: nothing in the hero, the head beside "about me",
 // then the thinking head for the rest of the page
 export function headPhase(section: string): "hero" | "about" | "thinking" {
   if (scrollY / innerHeight < 0.6 || section === "") return "hero";
