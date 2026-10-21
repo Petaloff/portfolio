@@ -10,7 +10,8 @@ import { AdaptiveDpr } from "./AdaptiveDpr";
 import { buildName, COUNT, fromModel, SIZE, type Formation } from "./formations";
 import { MoodLights } from "./MoodLights";
 import { Head } from "./Head";
-import { fitSide as fit, sidePose, smoothstep } from "./pose";
+import { Thought } from "./Thought";
+import { smoothstep, thoughtPose } from "./pose";
 import { models } from "./voxelArt";
 
 // Narrow windows get a coarser grid: fewer, bigger cubes stay crisp at small
@@ -176,19 +177,25 @@ function Voxels({ name, onReady }: { name: string; onReady?: () => void }) {
 
     // 0 is the hero banner, 1 the side figure
     const side = smoothstep(0.35, 1, scrolled);
-    const { roomy, x: sideX, width: sideW } = sidePose(viewport, size);
+    // Off the hero the figure is what the head is thinking about, inside its cloud
+    const { roomy, cloud, inner } = thoughtPose(viewport, size);
     const fitHero = Math.min(1, (viewport.width * 0.8) / layout.width);
-    // The side figure turns, so solid shapes need room for their diagonal
-    const fitSide = fit(layout, sideW, viewport.height, roomy);
+    // The figure turns, so solid shapes need room for their diagonal
+    const fitSide = Math.min(inner.width / Math.hypot(layout.width, layout.depth), inner.height / layout.height);
     const lambda = calm ? 60 : 6;
     const scale = THREE.MathUtils.damp(g.scale.x, THREE.MathUtils.lerp(fitHero, fitSide, side), lambda, dt);
     g.scale.setScalar(scale);
-    g.position.x = THREE.MathUtils.damp(g.position.x, sideX * side, lambda, dt);
-    g.position.y = THREE.MathUtils.damp(g.position.y, viewport.height * 0.26 * (1 - side), lambda, dt);
-    // Turns with the scroll so the side figure shows its depth, facing the content
-    g.rotation.y = f.x * 0.12 * f.tilt - side * (0.45 + Math.sin(scrollY * 0.0015) * 0.3);
-    g.rotation.x = f.y * 0.08 * f.tilt + side * 0.18;
-    mat.opacity = THREE.MathUtils.damp(mat.opacity, THREE.MathUtils.lerp(1, roomy ? 0.85 : 0.3, side), lambda, dt);
+    g.position.x = THREE.MathUtils.damp(g.position.x, cloud.x * side, lambda, dt);
+    g.position.y = THREE.MathUtils.damp(
+      g.position.y,
+      THREE.MathUtils.lerp(viewport.height * 0.26, cloud.y, side),
+      lambda,
+      dt,
+    );
+    // Turns with the scroll so the figure shows its depth, facing the content
+    g.rotation.y = f.x * 0.12 * f.tilt - side * (0.35 + Math.sin(scrollY * 0.0015) * 0.25);
+    g.rotation.x = f.y * 0.08 * f.tilt + side * 0.12;
+    mat.opacity = THREE.MathUtils.damp(mat.opacity, THREE.MathUtils.lerp(1, roomy ? 1 : 0.3, side), lambda, dt);
 
     // Cursor in the name's local space
     const cx = ((f.x * viewport.width) / 2 - g.position.x) / scale;
@@ -341,6 +348,7 @@ export default function VoxelScene({
       <MoodLights />
       <Voxels name={name} onReady={onReady} />
       <Head skin={skin} />
+      <Thought />
     </Canvas>
   );
 }

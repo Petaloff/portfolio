@@ -6,14 +6,10 @@ import * as THREE from "three";
 import { useCalm } from "@/lib/media";
 import { sceneState } from "@/lib/scene";
 import { fromModel, SIZE } from "./formations";
-import { fitSide, sidePose } from "./pose";
+import { fitSide, headPhase, thoughtPose } from "./pose";
 import { headFromSkin, models, type Model } from "./voxelArt";
 
 const N = models.head.voxels.length;
-// Size of the head docked in the corner, in CSS pixels
-const DOCK = 84;
-const DOCK_ROOMY = 116;
-
 function readColors() {
   const style = getComputedStyle(document.documentElement);
   return {
@@ -22,9 +18,9 @@ function readColors() {
   };
 }
 
-// The Minecraft head of the "about me" section. It looks at the cursor, and
-// once the page scrolls past that section it docks in the bottom left corner
-// and keeps watching from there. Hidden in the hero, where the name is
+// The Minecraft head on the right of the page. It looks at the cursor, stands
+// beside "about me" and stays for the rest of the page, thinking about each
+// section (see Thought). Hidden in the hero, where the name is
 export function Head({ skin }: { skin?: string }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
@@ -96,28 +92,25 @@ export function Head({ skin }: { skin?: string }) {
     timer.update();
     const dt = Math.min(timer.getDelta(), 1 / 30);
 
-    const hero = scrollY / innerHeight < 0.6;
-    const section = sceneState.section;
-    const about = !hero && section === "about";
-    const docked = !hero && !about && section !== "";
-    visible.current = about || docked;
+    const phase = headPhase(sceneState.section);
+    visible.current = phase !== "hero";
 
-    const { px, margin, roomy, x: sideX, width: sideW } = sidePose(viewport, size);
-    let x = sideX;
+    const pose = thoughtPose(viewport, size);
+    let x = pose.x;
     let y = 0;
-    let scale = visible.current ? fitSide(layout, sideW, viewport.height, roomy) : 0;
-    let opacity = roomy ? 0.95 : 0.35;
-    if (docked) {
-      const dock = roomy ? Math.min(DOCK_ROOMY, margin * 0.5) : DOCK;
-      x = -viewport.width / 2 + (roomy ? margin / 2 : 24 + dock / 2) * px;
-      y = -viewport.height / 2 + (28 + dock / 2) * px;
-      scale = (dock * px) / Math.hypot(layout.width, layout.depth);
-      opacity = 1;
+    let scale = fitSide(layout, pose.width, viewport.height, pose.roomy);
+    const opacity = pose.roomy ? 0.95 : 0.35;
+    if (phase === "thinking") {
+      // Sinks a little to make room for the thought cloud above
+      x = pose.head.x;
+      y = pose.head.y;
+      scale = pose.head.width / Math.hypot(layout.width, layout.depth);
     }
     // Slipping away into the hero, it stays where it was and shrinks
     if (!visible.current) {
       x = g.position.x;
       y = g.position.y;
+      scale = 0;
     }
 
     const lambda = calm ? 60 : 5;
@@ -130,7 +123,7 @@ export function Head({ skin }: { skin?: string }) {
     const p = sceneState.pointer;
     const dx = (p.x - g.position.x / (viewport.width / 2)) * viewport.aspect;
     const dy = p.y + g.position.y / (viewport.height / 2);
-    const yaw = calm ? (docked ? 0.4 : -0.4) : THREE.MathUtils.clamp(Math.atan(dx / 0.9), -0.9, 0.9);
+    const yaw = calm ? -0.4 : THREE.MathUtils.clamp(Math.atan(dx / 0.9), -0.9, 0.9);
     const pitch = calm ? 0.15 : THREE.MathUtils.clamp(Math.atan(dy / 0.9), -0.55, 0.55);
     const turn = calm ? 60 : 8;
     g.rotation.y = THREE.MathUtils.damp(g.rotation.y, yaw, turn, dt);
