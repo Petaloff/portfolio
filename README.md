@@ -11,16 +11,26 @@ npm install
 npm run dev
 ```
 
+| Команда             | Что делает                                 |
+| ------------------- | ------------------------------------------ |
+| `npm run lint`      | ESLint (правила Next.js + TypeScript)      |
+| `npm run format`    | Prettier, заодно сортирует классы Tailwind |
+| `npm run typecheck` | Генерирует типы роутов и гоняет `tsc`      |
+| `npm test`          | Vitest                                     |
+| `npm run check`     | Всё вышеперечисленное разом                |
+
+Перед коммитом husky запускает lint-staged: ESLint и Prettier только по изменённым файлам.
+
 ## Где что лежит
 
-| Что | Где |
-| --- | --- |
-| Проекты (карточки) | `content/projects.ts` |
-| Кейсы проектов | `content/projects/<slug>.<ru\|en>.mdx` (и `caseStudy: true` в карточке) |
-| Посты блога | `content/blog/<slug>.mdx`, метаданные в `export const meta` (`lang`, `tags`, `date`) |
-| Тексты интерфейса | `messages/ru.json`, `messages/en.json` |
-| Контакты, ники, стек | `src/lib/site.ts` |
-| Воксельная сцена | `src/components/three/` (раскладка ника в `formations.ts`) |
+| Что                  | Где                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| Проекты (карточки)   | `content/projects.ts`                                                                |
+| Кейсы проектов       | `content/projects/<slug>.<ru\|en>.mdx` (и `caseStudy: true` в карточке)              |
+| Посты блога          | `content/blog/<slug>.mdx`, метаданные в `export const meta` (`lang`, `tags`, `date`) |
+| Тексты интерфейса    | `messages/ru.json`, `messages/en.json`                                               |
+| Контакты, ники, стек | `src/lib/site.ts`                                                                    |
+| Воксельная сцена     | `src/components/three/` (раскладка ника в `formations.ts`)                           |
 
 ## 3D и облегчённая версия
 
