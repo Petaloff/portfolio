@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extrude, headFromSkin, models, upsample } from "./voxelArt";
+import { extrude, HEAD_VOXELS, headFromSkin, models, upsample } from "./voxelArt";
 import { COUNT, fromModel } from "./formations";
 
 describe("extrude", () => {
@@ -47,8 +47,17 @@ describe("headFromSkin", () => {
     const head = headFromSkin(pixels);
     const colorAt = (x: number, y: number, z: number) =>
       head.colors![head.voxels.findIndex((v) => v[0] === x && v[1] === y && v[2] === z)];
-    expect(head.voxels).toHaveLength(8 ** 3 - 6 ** 3);
+    expect(head.voxels).toHaveLength(HEAD_VOXELS);
     expect(colorAt(0, 7, 7)).toEqual([1, 0, 0]);
     expect(colorAt(7, 0, 7)).toEqual([0, 1, 0]);
+  });
+});
+
+describe("head budget", () => {
+  it("keeps every voxel of the skin head and the plain one", () => {
+    for (const model of [headFromSkin(new Uint8ClampedArray(64 * 64 * 4)), models.head]) {
+      const layout = fromModel(model, HEAD_VOXELS);
+      expect(Array.from(layout.scales).filter((s) => s > 0)).toHaveLength(model.voxels.length);
+    }
   });
 });
