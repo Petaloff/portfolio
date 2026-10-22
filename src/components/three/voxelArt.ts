@@ -85,6 +85,10 @@ function head(): Model {
   return out;
 }
 
+// Voxels in the full 8×8×8 shell. The skin head fills all of them, the plain
+// one leaves the mouth out, so the head is sized for the larger of the two
+export const HEAD_VOXELS = 8 ** 3 - 6 ** 3;
+
 // The head from a 64×64 Minecraft skin as the same 8×8×8 shell. Each surface
 // voxel takes the pixel of the face it sits on (front wins at edges, then top,
 // sides, back, bottom), with the hat layer drawn over it where it is opaque.
