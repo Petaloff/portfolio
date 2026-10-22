@@ -61,7 +61,7 @@ function FullScene({ name, skin, onFail }: { name: string; skin?: string; onFail
 // The voxel name lives on the home page only, in 3D. It stays for the whole
 // page and changes shape with the sections. The light version's cluster is
 // part of the hero itself (LiteVoxels), so it scrolls away with it
-// skin is the Minecraft username whose head the "about" figure wears
+// skin is the URL of the Minecraft skin whose head the "about" figure wears
 export function Background({ name, skin }: { name: string; skin?: string }) {
   const t = useTranslations("mode");
   const mode = useRenderMode();

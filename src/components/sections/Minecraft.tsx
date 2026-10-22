@@ -1,12 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { SkinViewer } from "@/components/SkinViewer";
-import { getServerStatus, mcUsername } from "@/lib/minecraft";
+import { getServerStatus, getSkin } from "@/lib/minecraft";
 import { EditorWindow } from "./EditorWindow";
 
 // Skin on the left, server status as a server.properties-style file on the right
 export async function Minecraft() {
   const t = await getTranslations("minecraft");
-  const status = await getServerStatus();
+  const [status, skin] = await Promise.all([getServerStatus(), getSkin()]);
   const rows: [string, string, string?][] =
     status.state === "planned"
       ? [
@@ -30,7 +30,7 @@ export async function Minecraft() {
     <EditorWindow id="minecraft" title={t("title")}>
       <div className="grid items-center gap-10 md:grid-cols-[auto_1fr]">
         <figure className="flex flex-col items-center gap-2">
-          <SkinViewer username={mcUsername} hint={t("drag")} />
+          <SkinViewer skin={skin} hint={t("drag")} />
         </figure>
         <div className="font-mono text-sm leading-8">
           <p className="mb-4 text-muted"># {t("lead")}</p>

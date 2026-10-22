@@ -21,6 +21,7 @@ function readColors() {
 // The Minecraft head of the home page. It looks at the cursor, sits under the
 // name in the intro, then stands beside the hero text and "about me" and stays
 // for the rest of the page, thinking about each section (see Thought)
+// skin is the URL of the skin texture (see getSkin)
 export function Head({ skin }: { skin?: string }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
@@ -57,7 +58,7 @@ export function Head({ skin }: { skin?: string }) {
         // a tainted canvas keeps the plain head
       }
     };
-    img.src = `https://mc-heads.net/skin/${skin}`;
+    img.src = skin;
     return () => {
       cancelled = true;
     };

@@ -10,6 +10,7 @@ import { MaintenanceEditor } from "@/components/admin/MaintenanceEditor";
 import { MessagesEditor } from "@/components/admin/MessagesEditor";
 import { PostsEditor } from "@/components/admin/PostsEditor";
 import { ProjectsEditor } from "@/components/admin/ProjectsEditor";
+import { SkinAdmin } from "@/components/admin/SkinAdmin";
 import { routing, type Locale } from "@/i18n/routing";
 import { flatten } from "@/lib/admin/messages";
 import { defaultMessages, getLegal, getMessageOverrides, getProjectList, getStoredPosts } from "@/lib/cms";
@@ -17,6 +18,7 @@ import { getEditablePosts } from "@/lib/content";
 import { getEntries } from "@/lib/guestbook";
 import { LEGAL_DOCS } from "@/lib/legal";
 import { getMaintenance } from "@/lib/maintenance";
+import { getSkin } from "@/lib/minecraft";
 import { storageEnabled } from "@/lib/redis";
 import { adminLogin, adminLogout } from "./actions";
 
@@ -57,7 +59,7 @@ async function Admin() {
   // Signed in as someone else: the page simply does not exist for them
   if (!session.user.owner) notFound();
 
-  const [projects, posts, stored, entries, messages, legal, maintenance] = await Promise.all([
+  const [projects, posts, stored, entries, messages, legal, maintenance, skin] = await Promise.all([
     getProjectList(),
     getEditablePosts(),
     getStoredPosts(),
@@ -73,6 +75,7 @@ async function Admin() {
       LEGAL_DOCS.flatMap((doc) => routing.locales.map(async (l) => ({ doc, locale: l, text: await getLegal(doc, l) }))),
     ),
     getMaintenance({ fresh: true }),
+    getSkin(),
   ]);
   const giscus = process.env.NEXT_PUBLIC_GISCUS_REPO;
 
@@ -120,6 +123,7 @@ async function Admin() {
             count: maintenance.allow.length,
             content: <MaintenanceEditor config={maintenance} locale={locale} />,
           },
+          { id: "skin", label: "Скин", content: <SkinAdmin skin={skin} /> },
           {
             id: "comments",
             label: "Комментарии",

@@ -24,6 +24,7 @@ import { getPostFileSlugs } from "@/lib/content";
 import { clearEntries, removeEntry } from "@/lib/guestbook";
 import { LEGAL_DOCS, type LegalDoc } from "@/lib/legal";
 import { getMaintenance, saveMaintenance } from "@/lib/maintenance";
+import { SKIN_TAG } from "@/lib/minecraft";
 import { storageEnabled } from "@/lib/redis";
 
 export type AdminState = {
@@ -195,5 +196,12 @@ export async function removeMaintenanceUser(id: string): Promise<AdminState> {
   const config = await getMaintenance({ fresh: true });
   await saveMaintenance({ ...config, allow: config.allow.filter((u) => u.id !== id) });
   refreshRouter();
+  return { ok: true };
+}
+
+// The skin isn't stored in Redis, so this works without it; the next render asks Mojang again
+export async function refreshSkin(): Promise<AdminState> {
+  await requireOwner();
+  refresh(SKIN_TAG);
   return { ok: true };
 }
