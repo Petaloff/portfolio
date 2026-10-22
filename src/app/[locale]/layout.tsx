@@ -16,7 +16,7 @@ import { Background } from "@/components/three/Background";
 import { Overlay } from "@/components/three/Overlay";
 import { routing, type Locale } from "@/i18n/routing";
 import { introScript } from "@/lib/introScript";
-import { mcUsername } from "@/lib/minecraft";
+import { getSkin } from "@/lib/minecraft";
 import { pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 import "../globals.css";
@@ -79,7 +79,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
           <AmbientVoxels />
           {/* Reads the pathname, so it streams in on pages that render at request time */}
           <Suspense>
-            <Background name={site.name.toUpperCase()} skin={mcUsername} />
+            <SkinnedBackground />
           </Suspense>
           <Header />
           <ScrollProgress />
@@ -92,4 +92,10 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
       </body>
     </html>
   );
+}
+
+// The skin is looked up on the server (cached for an hour), so it streams in with the scene
+async function SkinnedBackground() {
+  const skin = await getSkin();
+  return <Background name={site.name.toUpperCase()} skin={skin.url} />;
 }

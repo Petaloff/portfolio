@@ -3,18 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useCalm, usePhone } from "@/lib/media";
 import { onSceneWake, sceneState } from "@/lib/scene";
+import type { Skin } from "@/lib/minecraft";
 import { useRenderMode } from "@/lib/store";
 
 // Rotating 3D skin on desktop in 3D mode, standing on a little grass block. It
 // only renders while on screen, stops turning and walks while hovered, waves when clicked and
 // jumps with the easter egg. Phones get a flat head and the light version a
 // flat body render, so neither spends a WebGL context on it
-export function SkinViewer({ username, hint }: { username: string; hint: string }) {
+export function SkinViewer({ skin, hint }: { skin: Skin; hint: string }) {
   const phone = usePhone();
   const mode = useRenderMode();
   const calm = useCalm();
   const canvas = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
+  // Flat renders try the texture hash first, then the name
+  const [render, setRender] = useState(skin.id);
   const live = !phone && mode === "full";
 
   useEffect(() => {
@@ -38,7 +41,7 @@ export function SkinViewer({ username, hint }: { username: string; hint: string 
       const idle = () => (calm ? null : new IdleAnimation());
       viewer.animation = idle();
       viewer.controls.enableZoom = false;
-      viewer.loadSkin(`https://mc-heads.net/skin/${username}`).catch(() => setFailed(true));
+      viewer.loadSkin(skin.url, { model: skin.slim ? "slim" : "default" }).catch(() => setFailed(true));
 
       // Grass block under the feet (the model's soles sit at y = -16)
       const style = getComputedStyle(document.documentElement);
@@ -114,25 +117,25 @@ export function SkinViewer({ username, hint }: { username: string; hint: string 
       disposed = true;
       dispose();
     };
-  }, [live, calm, username]);
+  }, [live, calm, skin.url, skin.slim]);
 
   if (failed) return null;
   if (!live) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={phone ? `https://mc-heads.net/avatar/${username}/96` : `https://mc-heads.net/body/${username}/150`}
-        alt={username}
+        src={phone ? `https://mc-heads.net/avatar/${render}/96` : `https://mc-heads.net/body/${render}/150`}
+        alt={skin.name}
         width={phone ? 96 : 150}
         height={phone ? 96 : 300}
         className="h-auto [image-rendering:pixelated]"
-        onError={() => setFailed(true)}
+        onError={() => (render === skin.name ? setFailed(true) : setRender(skin.name))}
       />
     );
   }
   return (
     <>
-      <canvas ref={canvas} className="cursor-grab active:cursor-grabbing" aria-label={username} />
+      <canvas ref={canvas} className="cursor-grab active:cursor-grabbing" aria-label={skin.name} />
       <figcaption className="font-mono text-[11px] text-muted">↻ {hint}</figcaption>
     </>
   );
