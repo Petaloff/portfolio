@@ -1,6 +1,7 @@
 "use client";
 
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useSyncExternalStore } from "react";
@@ -47,6 +48,7 @@ export function Analytics() {
   return (
     <>
       <VercelAnalytics />
+      <SpeedInsights />
       {mounted && POSTHOG_KEY && <ConsentBanner open={consent === "unset"} />}
     </>
   );
