@@ -7,9 +7,10 @@ import { useCalm } from "@/lib/media";
 import { sceneState } from "@/lib/scene";
 import { fromModel, SIZE } from "./formations";
 import { cloudBob, fitSide, headPhase, headSide, headState, introPose, spring, thoughtPose } from "./pose";
-import { headFromSkin, models, type Model } from "./voxelArt";
+import { HEAD_VOXELS, headFromSkin, models, type Model } from "./voxelArt";
 
-const N = models.head.voxels.length;
+// Sized for the skin head: a smaller budget would thin it out and leave holes
+const N = HEAD_VOXELS;
 function readColors() {
   const style = getComputedStyle(document.documentElement);
   return {
